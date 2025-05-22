@@ -93,23 +93,22 @@ const pollData = async () => {
 };
 
 watch(
-  () => appStore.leftMenuFilters.showBus,
+  () => appStore.leftMenuFilters.showNight,
   (val) => {
     if (val) {
-      // map.addLayer(busLayerGroup);
+      Object.keys(vehicleLayerGroups).forEach((x) => {
+        const layer = vehicleLayerGroups[x];
+        if ([...nightBusLines, ...nightTramLines].includes(x)) {
+          map.addLayer(layer);
+        }
+      });
     } else {
-      // map.removeLayer(busLayerGroup);
-    }
-  }
-);
-
-watch(
-  () => appStore.leftMenuFilters.showTram,
-  (val) => {
-    if (val) {
-      // map.addLayer(tramLayerGroup);
-    } else {
-      // map.removeLayer(tramLayerGroup);
+      Object.keys(vehicleLayerGroups).forEach((x) => {
+        const layer = vehicleLayerGroups[x];
+        if ([...nightBusLines, ...nightTramLines].includes(x)) {
+          map.removeLayer(layer);
+        }
+      });
     }
   }
 );

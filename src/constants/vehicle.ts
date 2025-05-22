@@ -144,3 +144,6 @@ export const busLines = [
   "310",
   "315"
 ];
+
+export const allTramLines = [...tramLines, ...nightTramLines];
+export const allBusLines = [...busLines, ...nightBusLines];

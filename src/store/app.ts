@@ -1,5 +1,6 @@
+import { allBusLines, allTramLines, busLines, tramLines } from "@/constants/vehicle";
 import { defineStore } from "pinia";
-import { reactive, ref } from "vue";
+import { computed, reactive, ref } from "vue";
 import { useI18n } from "vue-i18n";
 import { useTheme } from "vuetify";
 
@@ -7,6 +8,8 @@ interface ILeftMenuFilters {
   showBus: boolean;
   showTram: boolean;
   menuOpen: boolean;
+  showNight: boolean;
+  showRoutes: boolean;
   activeVehicles: Set<string>;
 }
 
@@ -23,6 +26,8 @@ export const useAppStore = defineStore(
       showBus: true,
       showTram: true,
       menuOpen: true,
+      showNight: true,
+      showRoutes: false,
       activeVehicles: new Set()
     });
 
@@ -45,12 +50,30 @@ export const useAppStore = defineStore(
       i18n.locale.value = lang;
     };
 
+    const tramsToDisplay = computed(() => {
+      if (!leftMenuFilters.showNight) {
+        return [...tramLines];
+      } else {
+        return [...allTramLines];
+      }
+    });
+
+    const busesToDisplay = computed(() => {
+      if (!leftMenuFilters.showNight) {
+        return [...busLines];
+      } else {
+        return [...allBusLines];
+      }
+    });
+
     return {
       loading,
       darkMode,
       language,
       loadingData,
       leftMenuFilters,
+      tramsToDisplay,
+      busesToDisplay,
       toggleDarkMode,
       setTheme,
       setLanguage

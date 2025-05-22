@@ -28,8 +28,8 @@
           flat
           variant="text"
           size="30px"
-          :color="appStore.leftMenuFilters.showBus ? 'blue' : 'grey'"
-          @click="appStore.leftMenuFilters.showBus = !appStore.leftMenuFilters.showBus"
+          :color="allBusesShowing ? 'blue' : 'grey'"
+          @click="toggleBuses"
         >
           <v-tooltip activator="parent"> Prikaži autobuse </v-tooltip>
           <v-icon> mdi-bus </v-icon>
@@ -40,16 +40,17 @@
           flat
           variant="text"
           size="30px"
-          :color="appStore.leftMenuFilters.showTram ? 'blue' : 'grey'"
-          @click="appStore.leftMenuFilters.showTram = !appStore.leftMenuFilters.showTram"
+          :color="allTramsShowing ? 'blue' : 'grey'"
+          @click="toggleTrams"
         >
           <v-tooltip activator="parent"> Prikaži tramvaje </v-tooltip>
           <v-icon> mdi-tram </v-icon>
         </v-btn>
       </div>
       <v-divider />
-      <div class="flex-column column justify-center pl-2 py-1">
+      <div class="d-flex pl-2 py-1 ga-2">
         <v-checkbox
+          v-model="appStore.leftMenuFilters.showRoutes"
           hide-details
           color="blue"
           density="compact"
@@ -58,14 +59,24 @@
             <div class="route_display_label">Prikaži trase</div>
           </template>
         </v-checkbox>
+        <v-checkbox
+          v-model="appStore.leftMenuFilters.showNight"
+          hide-details
+          color="blue"
+          density="compact"
+        >
+          <template #label>
+            <div class="route_display_label">Noćne linije</div>
+          </template>
+        </v-checkbox>
       </div>
       <v-divider />
       <div class="vehicle_filters">
-        <div class="flex-column column justify-center my-2 pb-1">
+        <div class="flex-column justify-center my-2 pb-1">
           <div class="text-caption pl-2 text-grey-darken-2">Tramvaji</div>
           <div class="d-flex ga-2 flex-wrap pl-2 mt-2">
             <div
-              v-for="tram in tramLines"
+              v-for="tram in appStore.tramsToDisplay"
               :key="tram"
               class="line_chip"
               :style="{
@@ -85,7 +96,7 @@
           <div class="text-caption pl-2 text-grey-darken-2">Autobusi</div>
           <div class="d-flex ga-2 flex-wrap pl-2 mt-2">
             <div
-              v-for="bus in busLines"
+              v-for="bus in appStore.busesToDisplay"
               :key="bus"
               class="line_chip"
               :style="{
@@ -118,8 +129,9 @@
 
 <script lang="ts" setup>
 import { routeColors } from "@/constants/app";
-import { busLines, tramLines } from "@/constants/vehicle";
+import { allBusLines, allTramLines } from "@/constants/vehicle";
 import { useAppStore } from "@/store/app";
+import { computed } from "vue";
 import { version } from "../../../package.json";
 
 const appStore = useAppStore();
@@ -131,6 +143,34 @@ const addToFilter = (value: string) => {
     appStore.leftMenuFilters.activeVehicles.add(value);
   }
 };
+
+const allTramsShowing = computed(() => {
+  return allTramLines.every((x) => appStore.leftMenuFilters.activeVehicles.has(x));
+});
+
+const allBusesShowing = computed(() => {
+  return allBusLines.every((x) => appStore.leftMenuFilters.activeVehicles.has(x));
+});
+
+const toggleBuses = () => {
+  if (allBusesShowing.value) {
+    allBusLines.forEach((x) => appStore.leftMenuFilters.activeVehicles.delete(x));
+  } else {
+    allBusLines.forEach((x) => {
+      appStore.leftMenuFilters.activeVehicles.add(x);
+    });
+  }
+};
+
+const toggleTrams = () => {
+  if (allTramsShowing.value) {
+    allTramLines.forEach((x) => appStore.leftMenuFilters.activeVehicles.delete(x));
+  } else {
+    allTramLines.forEach((x) => {
+      appStore.leftMenuFilters.activeVehicles.add(x);
+    });
+  }
+};
 </script>
 
 <style lang="scss" scoped>
@@ -140,7 +180,7 @@ const addToFilter = (value: string) => {
   z-index: 999;
   top: 25px;
   left: 25px;
-  width: 250px;
+  width: 275px;
   border-radius: 8px;
 }
 
