@@ -99,6 +99,13 @@ const pollData = async () => {
   }, 8000);
 };
 
+const createLayers = () => {
+  [...tramLines, ...busLines, ...nightBusLines, ...nightTramLines].forEach((x) => {
+    vehicleLayerGroups[x] = leafletController.layerGroup();
+    vehicleLayerGroups[x].addTo(map);
+  });
+};
+
 watch(
   () => appStore.leftMenuFilters.showNight,
   (val) => {
@@ -147,10 +154,7 @@ watch(
 onMounted(async () => {
   appStore.loading = true;
   initMap();
-  [...tramLines, ...busLines, ...nightBusLines, ...nightTramLines].forEach((x) => {
-    vehicleLayerGroups[x] = leafletController.layerGroup();
-    vehicleLayerGroups[x].addTo(map);
-  });
+  createLayers();
   await pollData();
   appStore.loading = false;
 });
