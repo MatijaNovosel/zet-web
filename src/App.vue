@@ -1,7 +1,7 @@
 <template>
   <v-app>
     <v-overlay
-      v-model="loading"
+      v-model="appStore.loading"
       persistent
       contained
       z-index="2000"
@@ -28,7 +28,6 @@
 </template>
 
 <script setup lang="ts">
-import { storeToRefs } from "pinia";
 import { onMounted } from "vue";
 import { useI18n } from "vue-i18n";
 import { useTheme } from "vuetify";
@@ -38,7 +37,6 @@ import { useAppStore } from "./store/app";
 const appStore = useAppStore();
 const i18n = useI18n();
 const theme = useTheme();
-const { loading } = storeToRefs(appStore);
 
 onMounted(() => {
   theme.global.name.value = appStore.darkMode ? "dark" : "light";

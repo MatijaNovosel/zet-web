@@ -61,6 +61,11 @@ const getData = async () => {
       type: getLineType(x.vehicle!.trip.routeId)
     }));
 
+    Object.keys(vehicleLayerGroups).forEach((x) => {
+      const layer = vehicleLayerGroups[x];
+      layer.clearLayers();
+    });
+
     for (const vehicle of state.vehicles) {
       const position = vehicle.position;
       const routeId = vehicle.trip.routeId;
@@ -89,7 +94,7 @@ const pollData = async () => {
   await getData();
   vehiclePollInterval = setInterval(async () => {
     await getData();
-  }, 1000_0000);
+  }, 8_000);
 };
 
 watch(
