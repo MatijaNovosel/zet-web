@@ -31,6 +31,9 @@ export const useAppStore = defineStore(
       activeVehicles: new Set()
     });
 
+    const progress = ref(0);
+    let progressInterval: NodeJS.Timeout | undefined;
+
     // Composables
     const theme = useTheme();
     const i18n = useI18n();
@@ -48,6 +51,23 @@ export const useAppStore = defineStore(
     const setLanguage = (lang: string) => {
       language.value = lang;
       i18n.locale.value = lang;
+    };
+
+    const startProgress = () => {
+      const duration = 8000;
+      const step = 100;
+      const intervalMs = duration / step;
+
+      progress.value = 0;
+      clearInterval(progressInterval);
+
+      progressInterval = setInterval(() => {
+        console.log(progress.value);
+        progress.value += 100 / step;
+        if (progress.value >= 100) {
+          progress.value = 100;
+        }
+      }, intervalMs);
     };
 
     const tramsToDisplay = computed(() => {
@@ -74,6 +94,8 @@ export const useAppStore = defineStore(
       leftMenuFilters,
       tramsToDisplay,
       busesToDisplay,
+      progress,
+      startProgress,
       toggleDarkMode,
       setTheme,
       setLanguage

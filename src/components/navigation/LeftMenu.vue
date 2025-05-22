@@ -7,17 +7,17 @@
     >
       <template #prepend>
         <v-progress-circular
-          v-if="appStore.loadingData"
-          indeterminate
-          class="mr-3"
-        />
-        <v-avatar
-          v-else
-          :loading="true"
           color="blue"
+          :model-value="appStore.progress"
+          class="mr-5"
         >
-          ZET
-        </v-avatar>
+          <v-icon
+            class="pulse"
+            size="15"
+          >
+            mdi-timer-sand
+          </v-icon>
+        </v-progress-circular>
       </template>
     </v-list-item>
     <template v-if="appStore.leftMenuFilters.menuOpen">

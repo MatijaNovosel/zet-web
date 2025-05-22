@@ -92,9 +92,11 @@ const getData = async () => {
 
 const pollData = async () => {
   await getData();
+  appStore.startProgress();
   vehiclePollInterval = setInterval(async () => {
     await getData();
-  }, 8_000);
+    appStore.startProgress();
+  }, 8000);
 };
 
 watch(
