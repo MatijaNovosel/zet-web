@@ -62,7 +62,6 @@ export const useAppStore = defineStore(
       clearInterval(progressInterval);
 
       progressInterval = setInterval(() => {
-        console.log(progress.value);
         progress.value += 100 / step;
         if (progress.value >= 100) {
           progress.value = 100;

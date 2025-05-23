@@ -13,6 +13,7 @@ import {
   tramLines
 } from "@/constants/vehicle";
 import { getLineType } from "@/helpers/gtfs";
+import { animateMarkerMove } from "@/helpers/map";
 import { Leaflet } from "@/models/common";
 import { IVehicleModel } from "@/models/vehicle";
 import { useAppStore } from "@/store/app";
@@ -38,6 +39,9 @@ let vehiclePollInterval: NodeJS.Timeout | null = null;
 const vehicleLayerGroups: any = {};
 const routeLayerGroups: any = {};
 
+const vehicleMarkerMap = new Map<string, any>();
+const routeLinestringMap = new Map<string, any>();
+
 const initMap = () => {
   map = leafletController
     .map("map", { zoomControl: false })
@@ -58,7 +62,7 @@ const getColorByRouteId = (routeId: string | undefined) => {
   return routeColors.default;
 };
 
-const getData = async () => {
+const getData = async (initial?: boolean) => {
   try {
     appStore.loadingData = true;
     const data = await gtfsService.getData();
@@ -68,28 +72,31 @@ const getData = async () => {
       type: getLineType(x.vehicle!.trip.routeId)
     }));
 
-    Object.keys(vehicleLayerGroups).forEach((x) => {
-      const layer = vehicleLayerGroups[x];
-      layer.clearLayers();
-    });
-
     for (const vehicle of state.vehicles) {
       const position = vehicle.position;
-      const routeId = vehicle.trip.routeId;
-      const color = getColorByRouteId(routeId);
 
-      const marker = leafletController.marker([position?.latitude, position?.longitude], {
-        icon: leafletController.divIcon({
-          html: `<div class="vehicle-marker" style="background-color: ${color};">${routeId}</div>`,
-          className: "",
-          iconSize: [35, 35]
-        })
-      });
+      if (initial) {
+        const routeId = vehicle.trip.routeId;
+        const color = getColorByRouteId(routeId);
+        const marker = leafletController.marker([position?.latitude, position?.longitude], {
+          icon: leafletController.divIcon({
+            html: `<div class="vehicle-marker" style="background-color: ${color};">${routeId}</div>`,
+            className: "",
+            iconSize: [35, 35]
+          })
+        });
 
-      const layerGroup = vehicleLayerGroups[vehicle.trip.routeId];
+        vehicleMarkerMap.set(vehicle.vehicle.id, marker);
+        const layerGroup = vehicleLayerGroups[vehicle.trip.routeId];
 
-      if (layerGroup) {
-        marker.addTo(layerGroup);
+        if (layerGroup) {
+          marker.addTo(layerGroup);
+        }
+      } else {
+        const marker = vehicleMarkerMap.get(vehicle.vehicle.id);
+        if (marker) {
+          animateMarkerMove(marker, [position.latitude, position.longitude]);
+        }
       }
     }
   } finally {
@@ -98,7 +105,7 @@ const getData = async () => {
 };
 
 const pollData = async () => {
-  await getData();
+  await getData(true);
   appStore.startProgress();
   vehiclePollInterval = setInterval(async () => {
     await getData();
