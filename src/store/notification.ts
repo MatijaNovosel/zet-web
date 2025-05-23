@@ -1,5 +1,5 @@
+import { Alert } from "@/models/notification";
 import { defineStore } from "pinia";
-import { Alert } from "src/models/notification";
 import { ref } from "vue";
 
 export const useNotificationStore = defineStore("notification", () => {

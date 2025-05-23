@@ -1,6 +1,6 @@
+import { CreateNotificationModel } from "@/models/notification";
 import { useNotificationStore } from "@/store/notification";
 import { randInt } from "../helpers/math";
-import { CreateNotificationModel } from "../models/notification";
 
 export const useNotifications = () => {
   const notificationStore = useNotificationStore();

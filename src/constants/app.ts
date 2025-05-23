@@ -26,6 +26,7 @@ export const LANGUAGE_OPTIONS = computed(() => [
 export const MAX_FILE_SIZE = 10_000_000;
 
 export const BACKEND_URL = import.meta.env.VITE_BACKEND_API as string;
+export const MAPTILER_KEY = import.meta.env.VITE_MAPTILER_KEY as string;
 
 export const routeColors: Record<number | string, string> = {
   "1": "#f44336",

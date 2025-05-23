@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import { GTFSService } from "@/api/services/gtfs";
-import { routeColors } from "@/constants/app";
+import { MAPTILER_KEY, routeColors } from "@/constants/app";
 import { busLines, nightBusLines, nightTramLines, tramLines } from "@/constants/vehicle";
 import { getLineType } from "@/helpers/gtfs";
 import { Leaflet } from "@/models/common";
@@ -38,7 +38,7 @@ const initMap = () => {
 
   leafletController.maptiler
     .maptilerLayer({
-      apiKey: "5Jgt1nFYAzGoT1jnqipD",
+      apiKey: MAPTILER_KEY,
       style: leafletController.maptiler.MapStyle.STREETS
     })
     .addTo(map);
