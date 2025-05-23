@@ -39,6 +39,7 @@ export const routeColors: Record<number | string, string> = {
   "110": "#00bcd4",
   "111": "#009688",
   "113": "#4caf50",
+  "115": "#795548",
   "116": "#8bc34a",
   "117": "#cddc39",
   "118": "#ffeb3b",
