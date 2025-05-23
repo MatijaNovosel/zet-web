@@ -97,8 +97,7 @@
 </template>
 
 <script lang="ts" setup>
-import { routeColors } from "@/constants/app";
-import { allBusLines, allTramLines } from "@/constants/vehicle";
+import { allBusLines, allTramLines, routeColors } from "@/constants/vehicle";
 import { useAppStore } from "@/store/app";
 import { computed } from "vue";
 import { useDisplay } from "vuetify";

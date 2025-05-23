@@ -4,8 +4,14 @@
 
 <script setup lang="ts">
 import { GTFSService } from "@/api/services/gtfs";
-import { MAPTILER_KEY, routeColors } from "@/constants/app";
-import { busLines, nightBusLines, nightTramLines, tramLines } from "@/constants/vehicle";
+import { MAPTILER_KEY } from "@/constants/app";
+import {
+  busLines,
+  nightBusLines,
+  nightTramLines,
+  routeColors,
+  tramLines
+} from "@/constants/vehicle";
 import { getLineType } from "@/helpers/gtfs";
 import { Leaflet } from "@/models/common";
 import { IVehicleModel } from "@/models/vehicle";
@@ -30,6 +36,7 @@ let map: any = null;
 let vehiclePollInterval: NodeJS.Timeout | null = null;
 
 const vehicleLayerGroups: any = {};
+const routeLayerGroups: any = {};
 
 const initMap = () => {
   map = leafletController
@@ -102,7 +109,9 @@ const pollData = async () => {
 const createLayers = () => {
   [...tramLines, ...busLines, ...nightBusLines, ...nightTramLines].forEach((x) => {
     vehicleLayerGroups[x] = leafletController.layerGroup();
+    routeLayerGroups[x] = leafletController.layerGroup();
     vehicleLayerGroups[x].addTo(map);
+    routeLayerGroups[x].addTo(map);
   });
 };
 
