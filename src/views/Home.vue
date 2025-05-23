@@ -4,7 +4,7 @@
 
 <script setup lang="ts">
 import { GTFSService } from "@/api/services/gtfs";
-import { MAPTILER_KEY } from "@/constants/app";
+import { DEFAULT_LOCATION, MAPTILER_KEY } from "@/constants/app";
 import {
   busLines,
   nightBusLines,
@@ -43,10 +43,8 @@ const vehicleMarkerMap = new Map<string, any>();
 const routeLinestringMap = new Map<string, any>();
 
 const initMap = () => {
-  map = leafletController
-    .map("map", { zoomControl: false })
-    .setView([45.786002691523166, 15.951815825053787], 16);
-
+  map = leafletController.map("map", { zoomControl: false });
+  map.setView(DEFAULT_LOCATION, 14);
   leafletController.maptiler
     .maptilerLayer({
       apiKey: MAPTILER_KEY,
@@ -164,6 +162,13 @@ watch(
   },
   {
     deep: true
+  }
+);
+
+watch(
+  () => appStore.currentLocationTrigger,
+  (val) => {
+    map.setView(val, 14);
   }
 );
 

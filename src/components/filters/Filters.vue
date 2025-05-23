@@ -27,6 +27,18 @@
         <v-tooltip activator="parent"> Prikaži tramvaje </v-tooltip>
         <v-icon> mdi-tram </v-icon>
       </v-btn>
+      <v-btn
+        class="ml-3"
+        icon
+        flat
+        variant="text"
+        size="30px"
+        color="blue"
+        @click="goToCurrentLocation"
+      >
+        <v-tooltip activator="parent"> Idi na moju lokaciju </v-tooltip>
+        <v-icon> mdi-crosshairs-gps </v-icon>
+      </v-btn>
     </div>
     <v-divider />
     <div class="d-flex pl-2 py-1 ga-2">
@@ -143,6 +155,17 @@ const toggleTrams = () => {
       appStore.leftMenuFilters.activeVehicles.add(x);
     });
   }
+};
+
+const goToCurrentLocation = () => {
+  navigator.geolocation.getCurrentPosition(
+    (position) => {
+      appStore.moveToCurrentLocation([position.coords.latitude, position.coords.longitude]);
+    },
+    () => {
+      //
+    }
+  );
 };
 </script>
 

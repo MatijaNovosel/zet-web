@@ -21,6 +21,7 @@ export const useAppStore = defineStore(
     const loadingData = ref(false);
     const language = ref("en");
     const darkMode = ref(false);
+    const currentLocationTrigger = ref([0, 0]);
 
     const leftMenuFilters = reactive<ILeftMenuFilters>({
       showBus: true,
@@ -85,6 +86,10 @@ export const useAppStore = defineStore(
       }
     });
 
+    const moveToCurrentLocation = (coords: number[]) => {
+      currentLocationTrigger.value = coords;
+    };
+
     return {
       loading,
       darkMode,
@@ -94,6 +99,8 @@ export const useAppStore = defineStore(
       tramsToDisplay,
       busesToDisplay,
       progress,
+      currentLocationTrigger,
+      moveToCurrentLocation,
       startProgress,
       toggleDarkMode,
       setTheme,
