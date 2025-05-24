@@ -11,6 +11,11 @@
   position: static;
 }
 
+a[href="https://www.maptiler.com"]
+{
+  display: none !important;
+}
+
 /* Shading */
 
 .top-border-shaded {

@@ -177,6 +177,23 @@ onMounted(async () => {
   initMap();
   createLayers();
   await pollData();
+
+  setTimeout(() => {
+    const attributionList = document.querySelector(".leaflet-control-attribution");
+    if (attributionList) {
+      const link1 = document.createElement("a");
+      link1.setAttribute("href", "https://github.com/knork-fork/zet-gtfs-backend");
+      link1.innerText = " © LK";
+
+      const link2 = document.createElement("a");
+      link2.setAttribute("href", "https://github.com/MatijaNovosel/zet-web");
+      link2.innerText = " © MN";
+
+      attributionList.append(link1);
+      attributionList.append(link2);
+    }
+  }, 2000);
+
   appStore.loading = false;
 });
 </script>
