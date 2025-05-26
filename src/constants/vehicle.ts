@@ -19,7 +19,6 @@ export const tramLines = [
 export const nightTramLines = ["31", "32", "33", "34"];
 
 export const nightBusLines = [
-  "301",
   "302",
   "303",
   "304",
@@ -276,7 +275,6 @@ export const routeColors: Record<number | string, string> = {
   "283": "#ff5722",
   "284": "#795548",
   "290": "#9e9e9e",
-  "301": "#ff0000",
   "302": "#ff9700",
   "303": "#d1ff00",
   "304": "#3aff00",
