@@ -5,6 +5,7 @@
 <script setup lang="ts">
 import { GTFSService } from "@/api/services/gtfs";
 import { MapService } from "@/api/services/map";
+import { RouteService } from "@/api/services/route";
 import { POLLING_DURATION } from "@/constants/app";
 import {
   allBusLines,
@@ -29,6 +30,7 @@ interface IState {
 const appStore = useAppStore();
 
 const gtfsService = new GTFSService();
+const routeService = new RouteService();
 const mapService = new MapService();
 
 const state = reactive<IState>({
@@ -134,22 +136,37 @@ watch(
 
 watch(
   () => appStore.leftMenuFilters.activeVehicles,
-  (val) => {
-    [...allTramLines, ...allBusLines].forEach((id) => {
-      const layer = mapService.getVehicleLayer(id);
-      if (layer) mapService.addLayer(layer);
+  async (val) => {
+    const allRoutes = [...allTramLines, ...allBusLines];
+    allRoutes.forEach((id) => {
+      const vehicleLayer = mapService.getVehicleLayer(id);
+      const routeLayer = mapService.getRouteLayer(id);
+      if (vehicleLayer) mapService.removeLayer(vehicleLayer);
+      if (routeLayer) mapService.removeLayer(routeLayer);
     });
 
     if (val.size) {
-      [...allTramLines, ...allBusLines].forEach((id) => {
-        const layer = mapService.getVehicleLayer(id);
-        if (!val.has(id) && layer) mapService.removeLayer(layer);
+      for (const routeId of val) {
+        const vehicleLayer = mapService.getVehicleLayer(routeId);
+        if (vehicleLayer) mapService.addLayer(vehicleLayer);
+        const existingRouteLayer = mapService.getRouteLayer(routeId);
+        if (existingRouteLayer && existingRouteLayer.getLayers().length) {
+          mapService.addLayer(existingRouteLayer);
+        } else {
+          const data = await routeService.getRouteGeography(routeId);
+          mapService.addRouteGeography(routeId, data);
+        }
+      }
+    } else {
+      allRoutes.forEach((id) => {
+        const vehicleLayer = mapService.getVehicleLayer(id);
+        if (vehicleLayer) mapService.addLayer(vehicleLayer);
+        const routeLayer = mapService.getRouteLayer(id);
+        if (routeLayer) mapService.removeLayer(routeLayer);
       });
     }
   },
-  {
-    deep: true
-  }
+  { deep: true }
 );
 
 watch(

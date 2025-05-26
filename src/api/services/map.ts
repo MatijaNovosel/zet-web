@@ -1,5 +1,6 @@
 import { DEFAULT_LOCATION, MAPTILER_KEY, POLLING_DURATION } from "@/constants/app";
-import { Layer, Map as LeafletMap, Marker } from "leaflet";
+import { routeColors } from "@/constants/vehicle";
+import { LayerGroup, Map as LeafletMap, Marker } from "leaflet";
 import { IMapService } from "./../interfaces/map";
 
 export class MapService implements IMapService {
@@ -8,8 +9,8 @@ export class MapService implements IMapService {
   vehicleMarkers: Map<string, Marker> = new Map();
   routeLinestrings: Map<string, Marker> = new Map();
 
-  vehicleLayers: Map<string, Layer> = new Map();
-  routeLayers: Map<string, Layer> = new Map();
+  vehicleLayers: Map<string, LayerGroup> = new Map();
+  routeLayers: Map<string, LayerGroup> = new Map();
 
   leafletInstance: any;
 
@@ -63,16 +64,48 @@ export class MapService implements IMapService {
     requestAnimationFrame(animate);
   }
 
-  removeLayer(layer: Layer): void {
+  removeLayer(layer: LayerGroup): void {
     this.map!.removeLayer(layer);
   }
 
-  addLayer(layer: Layer): void {
+  addLayer(layer: LayerGroup): void {
     this.map!.addLayer(layer);
   }
 
+  getRouteLayer(id: string): LayerGroup | undefined {
+    return this.routeLayers.get(id);
+  }
+
+  hideAllRoutes(): void {
+    //
+  }
+
+  addRouteGeography(id: string, geography: any): void {
+    let layer = this.routeLayers.get(id);
+
+    if (!layer) {
+      layer = this.leafletInstance.layerGroup();
+      this.routeLayers.set(id, layer!);
+    }
+
+    if (!layer!.getLayers().length) {
+      const routeGeoJsonLayer = this.leafletInstance.geoJSON(geography, {
+        style: {
+          color: routeColors[id],
+          weight: 5,
+          opacity: 0.8
+        }
+      });
+      routeGeoJsonLayer.addTo(layer);
+    }
+
+    if (this.map && !this.map.hasLayer(layer!)) {
+      this.map.addLayer(layer!);
+    }
+  }
+
   addRouteLayer(id: string): void {
-    const layer: Layer = this.leafletInstance.layerGroup();
+    const layer: LayerGroup = this.leafletInstance.layerGroup();
     layer.addTo(this.map!);
     this.routeLayers.set(id, layer);
   }
@@ -100,12 +133,17 @@ export class MapService implements IMapService {
   }
 
   addVehicleLayer(id: string): void {
-    const layer: Layer = this.leafletInstance.layerGroup();
+    const layer: LayerGroup = this.leafletInstance.layerGroup();
     layer.addTo(this.map!);
     this.vehicleLayers.set(id, layer);
   }
 
-  getVehicleLayer(id: string): Layer | undefined {
+  getVehicleLayer(id: string): LayerGroup | undefined {
     return this.vehicleLayers.get(id);
+  }
+
+  hasRouteGeography(id: string): boolean {
+    const layer = this.routeLayers.get(id);
+    return !!layer && layer.getLayers().length > 0;
   }
 }

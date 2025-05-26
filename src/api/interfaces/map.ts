@@ -1,4 +1,4 @@
-import { Layer, Marker } from "leaflet";
+import { LayerGroup, Marker } from "leaflet";
 
 export interface IMapService {
   createMap(leafletInstance: any): void;
@@ -6,13 +6,17 @@ export interface IMapService {
   updateMarkerCoords(marker: Marker, coords: [number, number]): void;
   animateMarkerToCoords(marker: Marker, coords: [number, number]): void;
 
-  removeLayer(layer: Layer): void;
-  addLayer(layer: Layer): void;
+  removeLayer(layer: LayerGroup): void;
+  addLayer(layer: LayerGroup): void;
 
+  hideAllRoutes(): void;
   addRouteLayer(id: string): void;
+  addRouteGeography(id: string, geography: any): void;
+  getRouteLayer(id: string): LayerGroup | undefined;
+  hasRouteGeography(id: string): boolean;
 
   addVehicleLayer(id: string): void;
-  getVehicleLayer(id: string): Layer | undefined;
+  getVehicleLayer(id: string): LayerGroup | undefined;
   addVehicleMarker(
     vehicleId: string,
     routeId: string,

@@ -1,3 +1,3 @@
 export interface IRouteService {
-  getRouteGeography(routeId: number): Promise<any>;
+  getRouteGeography(routeId: string): Promise<any>;
 }
