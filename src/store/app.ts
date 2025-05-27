@@ -21,7 +21,7 @@ export const useAppStore = defineStore(
     const loadingData = ref(false);
     const language = ref("en");
     const darkMode = ref(false);
-    const currentLocationTrigger = ref([0, 0]);
+    const currentLocationTrigger = ref<[number, number]>([0, 0]);
 
     const leftMenuFilters = reactive<ILeftMenuFilters>({
       showBus: true,
@@ -86,7 +86,7 @@ export const useAppStore = defineStore(
       }
     });
 
-    const moveToCurrentLocation = (coords: number[]) => {
+    const moveToCurrentLocation = (coords: [number, number]) => {
       currentLocationTrigger.value = coords;
     };
 

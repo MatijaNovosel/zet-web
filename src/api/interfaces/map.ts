@@ -25,4 +25,6 @@ export interface IMapService {
   ): void;
 
   getMarker(vehicleId: string): Marker | undefined;
+
+  isInViewport(coords: [number, number]): boolean;
 }

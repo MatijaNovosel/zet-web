@@ -12,7 +12,34 @@ export class MapService implements IMapService {
   vehicleLayers: Map<string, LayerGroup> = new Map();
   routeLayers: Map<string, LayerGroup> = new Map();
 
+  // Relacija vehicleId -> routeId
+  vehicleRouteMap: Map<string, string> = new Map();
+
   leafletInstance: any;
+
+  updateVisibleMarkers(): void {
+    if (!this.map) return;
+
+    const bounds = this.map.getBounds();
+
+    this.vehicleMarkers.forEach((marker, vehicleId) => {
+      const routeId = this.vehicleRouteMap.get(vehicleId);
+      if (!routeId) return;
+
+      const layer = this.vehicleLayers.get(routeId);
+      if (!layer) return;
+
+      const latlng = marker.getLatLng();
+      const isVisible = bounds.contains(latlng);
+      const isInLayer = layer.hasLayer(marker);
+
+      if (isVisible && !isInLayer) {
+        marker.addTo(layer);
+      } else if (!isVisible && isInLayer) {
+        layer.removeLayer(marker);
+      }
+    });
+  }
 
   createMap(leafletInstance: any): void {
     this.leafletInstance = leafletInstance;
@@ -30,6 +57,7 @@ export class MapService implements IMapService {
         style: leafletInstance.maptiler.MapStyle.STREETS
       })
       .addTo(this.map);
+    this.map!.on("moveend zoomend", () => this.updateVisibleMarkers());
   }
 
   goToLocation(coords: [number, number]): void {
@@ -124,8 +152,11 @@ export class MapService implements IMapService {
       })
     });
     this.vehicleMarkers.set(vehicleId, marker);
+    this.vehicleRouteMap.set(vehicleId, routeId);
     const layer = this.getVehicleLayer(routeId);
-    if (layer) marker.addTo(layer);
+    if (layer && this.isInViewport(position)) {
+      marker.addTo(layer);
+    }
   }
 
   getMarker(id: string): Marker | undefined {
@@ -145,5 +176,10 @@ export class MapService implements IMapService {
   hasRouteGeography(id: string): boolean {
     const layer = this.routeLayers.get(id);
     return !!layer && layer.getLayers().length > 0;
+  }
+
+  isInViewport(coords: [number, number]): boolean {
+    if (!this.map) return false;
+    return this.map.getBounds().contains(coords);
   }
 }
