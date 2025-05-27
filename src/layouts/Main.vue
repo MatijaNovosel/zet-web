@@ -11,11 +11,9 @@
 
 <script setup lang="ts">
 import LeftDrawer from "@/components/navigation/LeftDrawer.vue";
-import { useDisplay, useTheme } from "vuetify";
+import { useDisplay } from "vuetify";
 import LeftMenu from "../components/navigation/LeftMenu.vue";
 import Alerts from "../components/notifications/Alerts.vue";
-
-const theme = useTheme();
 
 const { mobile } = useDisplay();
 </script>

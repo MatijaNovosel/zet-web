@@ -51,12 +51,11 @@
 <script lang="ts" setup>
 import { useAppStore } from "@/store/app";
 import { ref } from "vue";
-import { useDisplay, useTheme } from "vuetify";
+import { useDisplay } from "vuetify";
 import { version } from "../../../package.json";
 import Filters from "../filters/Filters.vue";
 
 const appStore = useAppStore();
-const theme = useTheme();
 const { mobile } = useDisplay();
 
 const drawer = ref(false);
