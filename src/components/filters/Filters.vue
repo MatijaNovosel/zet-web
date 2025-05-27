@@ -43,16 +43,6 @@
     <v-divider />
     <div class="d-flex pl-2 py-1 ga-2">
       <v-checkbox
-        v-model="appStore.leftMenuFilters.showRoutes"
-        hide-details
-        color="blue"
-        density="compact"
-      >
-        <template #label>
-          <div class="route_display_label">Prikaži trase</div>
-        </template>
-      </v-checkbox>
-      <v-checkbox
         v-model="appStore.leftMenuFilters.showNight"
         hide-details
         color="blue"

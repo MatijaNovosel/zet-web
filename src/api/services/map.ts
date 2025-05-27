@@ -148,7 +148,13 @@ export class MapService implements IMapService {
   ): void {
     const marker = this.leafletInstance.marker(position, {
       icon: this.leafletInstance.divIcon({
-        html: `<div class="vehicle-marker" style="background-color: ${color};">${routeId}</div>`,
+        html: `
+          <div class="vehicle-marker" style="background-color: ${color};">
+            <div class="vehicle-marker-text">
+              ${routeId}
+            </div>
+          </div>
+        `,
         className: "",
         iconSize: [35, 35]
       })
