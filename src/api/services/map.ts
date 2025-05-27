@@ -75,7 +75,7 @@ export class MapService implements IMapService {
     const startLatLng = marker.getLatLng();
     const startTime = performance.now();
 
-    function animate(time: number) {
+    const animate = (time: number) => {
       const elapsed = time - startTime;
       const t = Math.min(elapsed / POLLING_DURATION, 1);
 
@@ -86,8 +86,10 @@ export class MapService implements IMapService {
 
       if (t < 1) {
         requestAnimationFrame(animate);
+      } else {
+        this.updateVisibleMarkers();
       }
-    }
+    };
 
     requestAnimationFrame(animate);
   }

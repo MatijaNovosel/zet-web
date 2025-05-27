@@ -83,6 +83,7 @@ const getData = async (initial?: boolean) => {
           mapService.animateMarkerToCoords(marker, [position.latitude, position.longitude]);
         }
       }
+      mapService.updateVisibleMarkers();
     }
   } finally {
     appStore.loadingData = false;

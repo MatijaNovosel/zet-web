@@ -8,3 +8,11 @@
 export function randInt(min: number, max: number) {
   return Math.floor(Math.random() * (max - min + 1)) + min;
 }
+
+export function toRadians(degrees: number): number {
+  return (degrees * Math.PI) / 180;
+}
+
+export function toDegrees(radians: number): number {
+  return (radians * 180) / Math.PI;
+}
