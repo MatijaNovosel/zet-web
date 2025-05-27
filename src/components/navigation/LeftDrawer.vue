@@ -11,7 +11,6 @@
     :order="1"
     v-model="drawer"
     mobile
-    :class="theme.current.value.dark ? '' : 'bg-grey-lighten-5'"
   >
     <template #prepend>
       <v-list-item

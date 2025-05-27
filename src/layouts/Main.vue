@@ -3,10 +3,7 @@
     <alerts />
     <left-drawer v-if="mobile" />
     <left-menu v-else />
-    <v-main
-      class="main"
-      :class="theme.current.value.dark ? '' : 'bg-grey-lighten-4'"
-    >
+    <v-main class="main">
       <router-view />
     </v-main>
   </v-layout>

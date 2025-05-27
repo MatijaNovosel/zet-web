@@ -2,7 +2,6 @@ import { allBusLines, allTramLines, busLines, tramLines } from "@/constants/vehi
 import { defineStore } from "pinia";
 import { computed, reactive, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { useTheme } from "vuetify";
 
 interface ILeftMenuFilters {
   showBus: boolean;
@@ -20,7 +19,6 @@ export const useAppStore = defineStore(
     const loading = ref(false);
     const loadingData = ref(false);
     const language = ref("en");
-    const darkMode = ref(false);
     const currentLocationTrigger = ref<[number, number]>([0, 0]);
 
     const leftMenuFilters = reactive<ILeftMenuFilters>({
@@ -36,18 +34,7 @@ export const useAppStore = defineStore(
     let progressInterval: NodeJS.Timeout | undefined;
 
     // Composables
-    const theme = useTheme();
     const i18n = useI18n();
-
-    const toggleDarkMode = () => {
-      darkMode.value = !darkMode.value;
-      theme.global.name.value = darkMode.value ? "dark" : "light";
-    };
-
-    const setTheme = (value: string) => {
-      darkMode.value = value === "dark";
-      theme.global.name.value = darkMode.value ? "dark" : "light";
-    };
 
     const setLanguage = (lang: string) => {
       language.value = lang;
@@ -92,7 +79,6 @@ export const useAppStore = defineStore(
 
     return {
       loading,
-      darkMode,
       language,
       loadingData,
       leftMenuFilters,
@@ -102,15 +88,13 @@ export const useAppStore = defineStore(
       currentLocationTrigger,
       moveToCurrentLocation,
       startProgress,
-      toggleDarkMode,
-      setTheme,
       setLanguage
     };
   },
   {
     persist: {
       storage: sessionStorage,
-      paths: ["darkMode", "language"]
+      paths: ["language"]
     }
   }
 );
