@@ -113,7 +113,7 @@ export class MapService implements IMapService {
             ${routeId}
           </div>
           <div class="vehicle-marker-rotation" style="transform: rotate(${rotation}deg)">
-            <div class="vehicle-marker-rotation-arrow" style="border-bottom: 8px solid ${color};"></div>
+            <div class="vehicle-marker-rotation-arrow" style="border-bottom: 12px solid ${color};"></div>
           </div>
         </div>
       `,
