@@ -183,9 +183,6 @@ export class MapService implements IMapService {
             <div class="vehicle-marker-text">
               ${routeId}
             </div>
-            <div class="vehicle-marker-rotation">
-              <div class="vehicle-marker-rotation-arrow" style="border-bottom: 10px solid ${color};"></div>
-            </div>
           </div>
         `,
         className: "",
