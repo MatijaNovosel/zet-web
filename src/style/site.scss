@@ -110,18 +110,12 @@ a[href="https://www.maptiler.com"]
   }
 }
 
-.vehicle-marker,
-.vehicle-marker-text,
-.vehicle-marker-rotation,
-.vehicle-marker-arrow {
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
-}
-
 .vehicle-marker {
   width: 35px;
   height: 35px;
   position: relative;
   border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 
   &-text {
     border-radius: 50%;
@@ -138,6 +132,7 @@ a[href="https://www.maptiler.com"]
     display: flex;
     align-items: center;
     justify-content: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
   }
 
   &-rotation {
@@ -147,6 +142,7 @@ a[href="https://www.maptiler.com"]
     background-color: transparent;
     width: 35px;
     height: 35px;
+    transition: transform 2s ease-in-out;
 
     &-arrow {
       position: absolute;

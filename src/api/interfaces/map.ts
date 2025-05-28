@@ -5,7 +5,8 @@ export interface IMapService {
   goToLocation(coords: [number, number]): void;
   updateMarkerCoords(marker: Marker, coords: [number, number]): void;
   animateMarkerToCoords(marker: Marker, coords: [number, number], vehicleId: number): void;
-  rotateMarker(marker: Marker, coords: [number, number], routeId: string, color: string): void;
+  rotateMarker(marker: Marker, rotation: number, vehicleId: string): void;
+  removeVehicleMarker(marker: Marker, vehicleId: string): void;
 
   removeLayer(layer: LayerGroup): void;
   addLayer(layer: LayerGroup): void;

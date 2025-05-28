@@ -17,10 +17,11 @@ import {
   tramLines
 } from "@/constants/vehicle";
 import { getLineType } from "@/helpers/gtfs";
+import { computeHeading } from "@/helpers/map";
 import { IGTFSEntityTripUpdateModel } from "@/models/gtfs";
 import { IVehicleModel } from "@/models/vehicle";
 import { useAppStore } from "@/store/app";
-import { onMounted, reactive, watch } from "vue";
+import { onMounted, onUnmounted, reactive, watch } from "vue";
 
 interface IState {
   vehicles: IVehicleModel[];
@@ -50,7 +51,7 @@ const getColorByRouteId = (routeId: string | undefined) => {
   return routeColors.default;
 };
 
-const getData = async (initial?: boolean) => {
+const getData = async () => {
   try {
     appStore.loadingData = true;
 
@@ -69,8 +70,9 @@ const getData = async (initial?: boolean) => {
       const position = vehicle.position;
       const routeId = vehicle.trip.routeId;
       const color = getColorByRouteId(routeId);
+      const marker = mapService.getMarker(vehicle.vehicle.id);
 
-      if (initial) {
+      if (!marker) {
         mapService.addVehicleMarker(
           vehicle.vehicle.id,
           routeId,
@@ -78,21 +80,38 @@ const getData = async (initial?: boolean) => {
           color
         );
       } else {
-        const marker = mapService.getMarker(vehicle.vehicle.id);
         if (marker) {
+          const rotation = computeHeading(
+            {
+              ...marker.getLatLng()
+            },
+            {
+              lat: position.latitude,
+              lng: position.longitude
+            }
+          );
+
           mapService.animateMarkerToCoords(marker, [position.latitude, position.longitude]);
-          mapService.rotateMarker(marker, [position.latitude, position.longitude], routeId, color);
+          mapService.rotateMarker(marker, rotation, vehicle.vehicle.id);
         }
       }
       mapService.updateVisibleMarkers();
     }
+
+    const activeVehicleIds = state.vehicles.map((x) => x.vehicle.id);
+
+    mapService.vehicleMarkers.forEach((marker, vehicleId) => {
+      if (!activeVehicleIds.includes(vehicleId)) {
+        mapService.removeVehicleMarker(marker, vehicleId);
+      }
+    });
   } finally {
     appStore.loadingData = false;
   }
 };
 
 const pollData = async () => {
-  await getData(true);
+  await getData();
   appStore.startProgress();
   vehiclePollInterval = setInterval(async () => {
     await getData();
@@ -185,5 +204,11 @@ onMounted(async () => {
   await pollData();
   setTimeout(setAttributions, 2000);
   appStore.loading = false;
+});
+
+onUnmounted(() => {
+  if (vehiclePollInterval) {
+    clearInterval(vehiclePollInterval);
+  }
 });
 </script>

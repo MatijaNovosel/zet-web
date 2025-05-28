@@ -20,3 +20,15 @@ export const generateRandomString = (n: number): string => {
   while (n--) res += sample(characters.split(""));
   return res;
 };
+
+export function darkenHexColor(hex: string, percent: number) {
+  hex = hex.replace(/^#/, "");
+  let r = parseInt(hex.substring(0, 2), 16);
+  let g = parseInt(hex.substring(2, 4), 16);
+  let b = parseInt(hex.substring(4, 6), 16);
+  r = Math.max(0, Math.floor(r * (1 - percent / 100)));
+  g = Math.max(0, Math.floor(g * (1 - percent / 100)));
+  b = Math.max(0, Math.floor(b * (1 - percent / 100)));
+  const toHex = (val: number) => val.toString(16).padStart(2, "0");
+  return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
+}

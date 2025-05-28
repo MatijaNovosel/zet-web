@@ -1,6 +1,6 @@
 import { DEFAULT_LOCATION, MAPTILER_KEY, POLLING_DURATION } from "@/constants/app";
 import { routeColors } from "@/constants/vehicle";
-import { computeHeading } from "@/helpers/map";
+import { darkenHexColor } from "@/helpers/misc";
 import { LayerGroup, Map as LeafletMap, Marker } from "leaflet";
 import { IMapService } from "./../interfaces/map";
 
@@ -8,6 +8,7 @@ export class MapService implements IMapService {
   map: LeafletMap | null = null;
 
   vehicleMarkers: Map<string, Marker> = new Map();
+  vehicleMarkerRotations: Map<string, number> = new Map();
   routeLinestrings: Map<string, Marker> = new Map();
 
   vehicleLayers: Map<string, LayerGroup> = new Map();
@@ -72,6 +73,12 @@ export class MapService implements IMapService {
     throw new Error("Method not implemented.");
   }
 
+  removeVehicleMarker(marker: Marker, vehicleId: string): void {
+    marker.remove();
+    this.vehicleMarkerRotations.delete(vehicleId);
+    this.vehicleMarkers.delete(vehicleId);
+  }
+
   animateMarkerToCoords(marker: Marker, coords: [number, number]): void {
     const startLatLng = marker.getLatLng();
     const startTime = performance.now();
@@ -95,33 +102,22 @@ export class MapService implements IMapService {
     requestAnimationFrame(animate);
   }
 
-  rotateMarker(marker: Marker, coords: [number, number], routeId: string, color: string): void {
-    const rotation = computeHeading(
-      {
-        ...marker.getLatLng()
-      },
-      {
-        lat: coords[0],
-        lng: coords[1]
+  rotateMarker(marker: Marker, rotation: number, vehicleId: string): void {
+    const el = marker.getElement();
+    if (!el) return;
+
+    const rotationDiv = el.querySelector(".vehicle-marker-rotation") as HTMLElement;
+    const previousRotation = this.vehicleMarkerRotations.get(vehicleId);
+
+    if (previousRotation) {
+      if (rotation !== 0) {
+        this.vehicleMarkerRotations.set(vehicleId, rotation);
+        rotationDiv.style.transform = `rotate(${rotation}deg)`;
       }
-    );
-
-    const newIcon = this.leafletInstance.divIcon({
-      html: `
-        <div class="vehicle-marker">
-          <div class="vehicle-marker-text" style="background-color: ${color};">
-            ${routeId}
-          </div>
-          <div class="vehicle-marker-rotation" style="transform: rotate(${rotation}deg)">
-            <div class="vehicle-marker-rotation-arrow" style="border-bottom: 12px solid ${color};"></div>
-          </div>
-        </div>
-      `,
-      className: "",
-      iconSize: [35, 35]
-    });
-
-    marker.setIcon(newIcon);
+    } else {
+      this.vehicleMarkerRotations.set(vehicleId, rotation);
+      rotationDiv.style.transform = `rotate(${rotation}deg)`;
+    }
   }
 
   removeLayer(layer: LayerGroup): void {
@@ -176,6 +172,8 @@ export class MapService implements IMapService {
     position: [number, number],
     color: string
   ): void {
+    const arrowColor = darkenHexColor(color, 15);
+
     const marker = this.leafletInstance.marker(position, {
       icon: this.leafletInstance.divIcon({
         html: `
@@ -183,12 +181,16 @@ export class MapService implements IMapService {
             <div class="vehicle-marker-text">
               ${routeId}
             </div>
+            <div class="vehicle-marker-rotation">
+            <div class="vehicle-marker-rotation-arrow" style="border-bottom: 12px solid ${arrowColor};"></div>
+          </div>
           </div>
         `,
         className: "",
         iconSize: [35, 35]
       })
     });
+
     this.vehicleMarkers.set(vehicleId, marker);
     this.vehicleRouteMap.set(vehicleId, routeId);
     const layer = this.getVehicleLayer(routeId);
