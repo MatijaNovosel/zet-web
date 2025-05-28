@@ -4,7 +4,8 @@ export interface IMapService {
   createMap(leafletInstance: any): void;
   goToLocation(coords: [number, number]): void;
   updateMarkerCoords(marker: Marker, coords: [number, number]): void;
-  animateMarkerToCoords(marker: Marker, coords: [number, number]): void;
+  animateMarkerToCoords(marker: Marker, coords: [number, number], vehicleId: number): void;
+  rotateMarker(marker: Marker, coords: [number, number], routeId: string, color: string): void;
 
   removeLayer(layer: LayerGroup): void;
   addLayer(layer: LayerGroup): void;

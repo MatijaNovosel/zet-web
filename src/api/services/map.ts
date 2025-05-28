@@ -1,5 +1,6 @@
 import { DEFAULT_LOCATION, MAPTILER_KEY, POLLING_DURATION } from "@/constants/app";
 import { routeColors } from "@/constants/vehicle";
+import { computeHeading } from "@/helpers/map";
 import { LayerGroup, Map as LeafletMap, Marker } from "leaflet";
 import { IMapService } from "./../interfaces/map";
 
@@ -94,6 +95,35 @@ export class MapService implements IMapService {
     requestAnimationFrame(animate);
   }
 
+  rotateMarker(marker: Marker, coords: [number, number], routeId: string, color: string): void {
+    const rotation = computeHeading(
+      {
+        ...marker.getLatLng()
+      },
+      {
+        lat: coords[0],
+        lng: coords[1]
+      }
+    );
+
+    const newIcon = this.leafletInstance.divIcon({
+      html: `
+        <div class="vehicle-marker">
+          <div class="vehicle-marker-text" style="background-color: ${color};">
+            ${routeId}
+          </div>
+          <div class="vehicle-marker-rotation" style="transform: rotate(${rotation}deg)">
+            <div class="vehicle-marker-rotation-arrow" style="border-bottom: 8px solid ${color};"></div>
+          </div>
+        </div>
+      `,
+      className: "",
+      iconSize: [35, 35]
+    });
+
+    marker.setIcon(newIcon);
+  }
+
   removeLayer(layer: LayerGroup): void {
     this.map!.removeLayer(layer);
   }
@@ -152,6 +182,9 @@ export class MapService implements IMapService {
           <div class="vehicle-marker" style="background-color: ${color};">
             <div class="vehicle-marker-text">
               ${routeId}
+            </div>
+            <div class="vehicle-marker-rotation">
+              <div class="vehicle-marker-rotation-arrow" style="border-bottom: 10px solid ${color};"></div>
             </div>
           </div>
         `,

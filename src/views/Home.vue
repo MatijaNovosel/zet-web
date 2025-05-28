@@ -67,10 +67,10 @@ const getData = async (initial?: boolean) => {
 
     for (const vehicle of state.vehicles) {
       const position = vehicle.position;
+      const routeId = vehicle.trip.routeId;
+      const color = getColorByRouteId(routeId);
 
       if (initial) {
-        const routeId = vehicle.trip.routeId;
-        const color = getColorByRouteId(routeId);
         mapService.addVehicleMarker(
           vehicle.vehicle.id,
           routeId,
@@ -81,6 +81,7 @@ const getData = async (initial?: boolean) => {
         const marker = mapService.getMarker(vehicle.vehicle.id);
         if (marker) {
           mapService.animateMarkerToCoords(marker, [position.latitude, position.longitude]);
+          mapService.rotateMarker(marker, [position.latitude, position.longitude], routeId, color);
         }
       }
       mapService.updateVisibleMarkers();
