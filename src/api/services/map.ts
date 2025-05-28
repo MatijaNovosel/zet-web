@@ -1,5 +1,6 @@
 import { DEFAULT_LOCATION, MAPTILER_KEY, POLLING_DURATION } from "@/constants/app";
 import { routeColors } from "@/constants/vehicle";
+import { computeHeading } from "@/helpers/map";
 import { darkenHexColor } from "@/helpers/misc";
 import { LayerGroup, Map as LeafletMap, Marker } from "leaflet";
 import { IMapService } from "./../interfaces/map";
@@ -102,21 +103,49 @@ export class MapService implements IMapService {
     requestAnimationFrame(animate);
   }
 
-  rotateMarker(marker: Marker, rotation: number, vehicleId: string): void {
-    const el = marker.getElement();
-    if (!el) return;
+  rotateMarker(
+    marker: Marker,
+    coords: [number, number],
+    routeId: string,
+    color: string,
+    vehicleId: string
+  ): void {
+    const rotation = computeHeading(
+      {
+        ...marker.getLatLng()
+      },
+      {
+        lat: coords[0],
+        lng: coords[1]
+      }
+    );
 
-    const rotationDiv = el.querySelector(".vehicle-marker-rotation") as HTMLElement;
+    const arrowColor = darkenHexColor(color, 15);
     const previousRotation = this.vehicleMarkerRotations.get(vehicleId);
 
+    const newIcon = this.leafletInstance.divIcon({
+      html: `
+          <div class="vehicle-marker">
+            <div class="vehicle-marker-text" style="background-color: ${color};">
+              ${routeId}
+            </div>
+            <div class="vehicle-marker-rotation" style="transform: rotate(${rotation}deg)">
+              <div class="vehicle-marker-rotation-arrow" style="border-bottom: 12px solid ${arrowColor};"></div>
+            </div>
+          </div>
+        `,
+      className: "",
+      iconSize: [35, 35]
+    });
+
     if (previousRotation) {
-      if (rotation !== 0) {
+      if (previousRotation !== rotation && rotation !== 0) {
         this.vehicleMarkerRotations.set(vehicleId, rotation);
-        rotationDiv.style.transform = `rotate(${rotation}deg)`;
+        marker.setIcon(newIcon);
       }
     } else {
       this.vehicleMarkerRotations.set(vehicleId, rotation);
-      rotationDiv.style.transform = `rotate(${rotation}deg)`;
+      marker.setIcon(newIcon);
     }
   }
 

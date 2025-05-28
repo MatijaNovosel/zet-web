@@ -17,7 +17,6 @@ import {
   tramLines
 } from "@/constants/vehicle";
 import { getLineType } from "@/helpers/gtfs";
-import { computeHeading } from "@/helpers/map";
 import { IGTFSEntityTripUpdateModel } from "@/models/gtfs";
 import { IVehicleModel } from "@/models/vehicle";
 import { useAppStore } from "@/store/app";
@@ -81,18 +80,14 @@ const getData = async () => {
         );
       } else {
         if (marker) {
-          const rotation = computeHeading(
-            {
-              ...marker.getLatLng()
-            },
-            {
-              lat: position.latitude,
-              lng: position.longitude
-            }
-          );
-
           mapService.animateMarkerToCoords(marker, [position.latitude, position.longitude]);
-          mapService.rotateMarker(marker, rotation, vehicle.vehicle.id);
+          mapService.rotateMarker(
+            marker,
+            [position.latitude, position.longitude],
+            routeId,
+            color,
+            vehicle.vehicle.id
+          );
         }
       }
       mapService.updateVisibleMarkers();
