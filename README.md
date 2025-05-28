@@ -4,6 +4,7 @@
 
 <h1 align=center>ZET Web</h1>
 <p align=center>Aplikacija za praćenje ZET vozila uživo.</p>
+<p align=center>Backend: <a href="https://github.com/knork-fork/zet-gtfs-backend">zet-gtfs-backend</a> </p>
 
 ## 🔨 Built With
 
