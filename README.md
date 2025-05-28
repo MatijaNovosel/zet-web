@@ -3,7 +3,7 @@
 </p>
 
 <h1 align=center>ZET Web</h1>
-<p align=center>Aplikacija za parsanje podataka ZET-a.</p>
+<p align=center>Aplikacija za praćenje ZET vozila uživo.</p>
 
 ## 🔨 Built With
 
