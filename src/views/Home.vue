@@ -143,8 +143,8 @@ const setAttributions = () => {
 };
 
 const getStops = async () => {
-  // const data = await stopsService.getStops();
-  // state.stops = data;
+  const data = await stopsService.getStops();
+  state.stops = data;
 };
 
 const pollCurrentLocation = () => {

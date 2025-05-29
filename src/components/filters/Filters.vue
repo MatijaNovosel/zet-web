@@ -97,11 +97,7 @@ const appStore = useAppStore();
 const { mobile } = useDisplay();
 
 const addToFilter = (value: string) => {
-  if (appStore.leftMenuFilters.activeVehicles.has(value)) {
-    appStore.leftMenuFilters.activeVehicles.delete(value);
-  } else {
-    appStore.leftMenuFilters.activeVehicles.add(value);
-  }
+  appStore.addToVehicleFilter(value);
 };
 
 const filtersStyle = computed(() => ({

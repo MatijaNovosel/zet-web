@@ -2,11 +2,13 @@ import { DEFAULT_LOCATION, MAPTILER_KEY, POLLING_DURATION } from "@/constants/ap
 import { routeColors } from "@/constants/vehicle";
 import { computeHeading } from "@/helpers/map";
 import { darkenHexColor } from "@/helpers/misc";
+import { useAppStore } from "@/store/app";
 import { LayerGroup, Map as LeafletMap, Marker } from "leaflet";
 import { IMapService } from "./../interfaces/map";
 
 export class MapService implements IMapService {
   map: LeafletMap | null = null;
+  appStore: any;
   currentLocationMarker: Marker | null = null;
 
   vehicleMarkers: Map<string, Marker> = new Map();
@@ -62,6 +64,7 @@ export class MapService implements IMapService {
   }
 
   createMap(leafletInstance: any): void {
+    this.appStore = useAppStore();
     this.leafletInstance = leafletInstance;
     this.map = leafletInstance.map("map", { zoomControl: false });
     this.map!.setView(
@@ -232,6 +235,10 @@ export class MapService implements IMapService {
         className: "",
         iconSize: [35, 35]
       })
+    });
+
+    marker.addEventListener("click", () => {
+      this.appStore.addToVehicleFilter(routeId);
     });
 
     this.vehicleMarkers.set(vehicleId, marker);

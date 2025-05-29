@@ -77,6 +77,14 @@ export const useAppStore = defineStore(
       currentLocationTrigger.value = coords;
     };
 
+    const addToVehicleFilter = (value: string) => {
+      if (leftMenuFilters.activeVehicles.has(value)) {
+        leftMenuFilters.activeVehicles.delete(value);
+      } else {
+        leftMenuFilters.activeVehicles.add(value);
+      }
+    };
+
     return {
       loading,
       language,
@@ -86,6 +94,7 @@ export const useAppStore = defineStore(
       busesToDisplay,
       progress,
       currentLocationTrigger,
+      addToVehicleFilter,
       moveToCurrentLocation,
       startProgress,
       setLanguage
