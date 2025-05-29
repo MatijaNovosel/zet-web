@@ -147,10 +147,10 @@ a[href="https://www.maptiler.com"]
   width: 20px;
   height: 20px;
   position: relative;
-  background-color: #007bff;
+  background-color: #4f9ef1;
   border-radius: 50%;
   box-shadow: 0 0 10px #007bffcc;
-  z-index: 10;
+  z-index: 99999 !important;
 }
 
 .current-location-marker::after {
