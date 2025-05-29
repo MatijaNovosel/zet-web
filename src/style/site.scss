@@ -78,23 +78,6 @@ a[href="https://www.maptiler.com"]
   background: #8092f5;
 }
 
-@keyframes pulse {
-  0% {
-    transform: scale(0.75);
-  }
-  50% {
-    transform: scale(1);
-    rotate: 180deg;
-  }
-  100% {
-    transform: scale(0.75);
-  }
-}
-
-.pulse {
-  animation: pulse 2s infinite;
-}
-
 .flex-gap {
   gap: 12px;
 }
@@ -158,4 +141,42 @@ a[href="https://www.maptiler.com"]
 
 #map {
   height: 100%;
+}
+
+.current-location-marker {
+  width: 20px;
+  height: 20px;
+  position: relative;
+  background-color: #007bff;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #007bffcc;
+  z-index: 10;
+}
+
+.current-location-marker::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #007bff80;
+  animation: pulse 1.5s ease-out infinite;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  70% {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.8);
+    opacity: 0;
+  }
 }

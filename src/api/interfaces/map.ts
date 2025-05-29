@@ -13,6 +13,7 @@ export interface IMapService {
     vehicleId: string
   ): void;
   removeVehicleMarker(marker: Marker, vehicleId: string): void;
+  updateCurrentLocation(coords: [number, number]): void;
 
   removeLayer(layer: LayerGroup): void;
   addLayer(layer: LayerGroup): void;

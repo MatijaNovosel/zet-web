@@ -6,6 +6,7 @@
 import { GTFSService } from "@/api/services/gtfs";
 import { MapService } from "@/api/services/map";
 import { RouteService } from "@/api/services/route";
+import { StopsService } from "@/api/services/stops";
 import { POLLING_DURATION } from "@/constants/app";
 import {
   allBusLines,
@@ -18,6 +19,7 @@ import {
 } from "@/constants/vehicle";
 import { getLineType } from "@/helpers/gtfs";
 import { IGTFSEntityTripUpdateModel } from "@/models/gtfs";
+import { IStopModel } from "@/models/stop";
 import { IVehicleModel } from "@/models/vehicle";
 import { useAppStore } from "@/store/app";
 import { onMounted, onUnmounted, reactive, watch } from "vue";
@@ -25,6 +27,7 @@ import { onMounted, onUnmounted, reactive, watch } from "vue";
 interface IState {
   vehicles: IVehicleModel[];
   tripUpdates: IGTFSEntityTripUpdateModel[];
+  stops: IStopModel[];
 }
 
 const appStore = useAppStore();
@@ -32,10 +35,12 @@ const appStore = useAppStore();
 const gtfsService = new GTFSService();
 const routeService = new RouteService();
 const mapService = new MapService();
+const stopsService = new StopsService();
 
 const state = reactive<IState>({
   vehicles: [],
-  tripUpdates: []
+  tripUpdates: [],
+  stops: []
 });
 
 let vehiclePollInterval: NodeJS.Timeout | null = null;
@@ -137,6 +142,24 @@ const setAttributions = () => {
   }
 };
 
+const getStops = async () => {
+  // const data = await stopsService.getStops();
+  // state.stops = data;
+};
+
+const pollCurrentLocation = () => {
+  setInterval(() => {
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        mapService.updateCurrentLocation([coords.latitude, coords.longitude]);
+      },
+      () => {
+        //
+      }
+    );
+  }, 5000);
+};
+
 watch(
   () => appStore.leftMenuFilters.showNight,
   (val) => {
@@ -197,6 +220,8 @@ onMounted(async () => {
   mapService.createMap(leafletInstance);
   createLayers();
   await pollData();
+  await getStops();
+  pollCurrentLocation();
   setTimeout(setAttributions, 2000);
   appStore.loading = false;
 });

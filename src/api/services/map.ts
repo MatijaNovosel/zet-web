@@ -7,6 +7,7 @@ import { IMapService } from "./../interfaces/map";
 
 export class MapService implements IMapService {
   map: LeafletMap | null = null;
+  currentLocationMarker: Marker | null = null;
 
   vehicleMarkers: Map<string, Marker> = new Map();
   vehicleMarkerRotations: Map<string, number> = new Map();
@@ -19,6 +20,22 @@ export class MapService implements IMapService {
   vehicleRouteMap: Map<string, string> = new Map();
 
   leafletInstance: any;
+
+  updateCurrentLocation(coords: [number, number]): void {
+    if (!this.currentLocationMarker) {
+      const marker = this.leafletInstance.marker(coords, {
+        icon: this.leafletInstance.divIcon({
+          className: "current-location-marker",
+          iconSize: [20, 20]
+        })
+      });
+      this.currentLocationMarker = marker;
+      this.currentLocationMarker?.addTo(this.map!);
+      return;
+    }
+
+    this.currentLocationMarker.setLatLng(coords);
+  }
 
   updateVisibleMarkers(): void {
     if (!this.map) return;
@@ -201,8 +218,6 @@ export class MapService implements IMapService {
     position: [number, number],
     color: string
   ): void {
-    const arrowColor = darkenHexColor(color, 15);
-
     const marker = this.leafletInstance.marker(position, {
       icon: this.leafletInstance.divIcon({
         html: `
@@ -211,7 +226,6 @@ export class MapService implements IMapService {
               ${routeId}
             </div>
             <div class="vehicle-marker-rotation">
-            <div class="vehicle-marker-rotation-arrow" style="border-bottom: 12px solid ${arrowColor};"></div>
           </div>
           </div>
         `,
