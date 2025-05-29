@@ -1,4 +1,4 @@
-import { DEFAULT_LOCATION, MAPTILER_KEY, POLLING_DURATION } from "@/constants/app";
+import { DEFAULT_LOCATION, MAPTILER_KEY, MapTypeEnum, POLLING_DURATION } from "@/constants/app";
 import { routeColors } from "@/constants/vehicle";
 import { computeHeading } from "@/helpers/map";
 import { darkenHexColor } from "@/helpers/misc";
@@ -10,6 +10,7 @@ export class MapService implements IMapService {
   map: LeafletMap | null = null;
   appStore: any;
   currentLocationMarker: Marker | null = null;
+  mapTilerLayer: any = null;
 
   vehicleMarkers: Map<string, Marker> = new Map();
   vehicleMarkerRotations: Map<string, number> = new Map();
@@ -22,6 +23,19 @@ export class MapService implements IMapService {
   vehicleRouteMap: Map<string, string> = new Map();
 
   leafletInstance: any;
+
+  changeMapType(type: number): void {
+    let style = null;
+    switch (type) {
+      case MapTypeEnum.Satellite:
+        style = this.leafletInstance.maptiler.MapStyle.HYBRID;
+        break;
+      case MapTypeEnum.Street:
+        style = this.leafletInstance.maptiler.MapStyle.STREETS;
+        break;
+    }
+    this.mapTilerLayer.setStyle(style);
+  }
 
   updateCurrentLocation(coords: [number, number]): void {
     if (!this.currentLocationMarker) {
@@ -74,12 +88,13 @@ export class MapService implements IMapService {
       },
       14
     );
-    leafletInstance.maptiler
+    const mapTilerLayer = leafletInstance.maptiler
       .maptilerLayer({
         apiKey: MAPTILER_KEY,
         style: leafletInstance.maptiler.MapStyle.STREETS
       })
       .addTo(this.map);
+    this.mapTilerLayer = mapTilerLayer;
     this.map!.on("moveend zoomend", () => this.updateVisibleMarkers());
   }
 

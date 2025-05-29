@@ -10,6 +10,7 @@ interface ILeftMenuFilters {
   menuOpen: boolean;
   showNight: boolean;
   showRoutes: boolean;
+  satelliteMap: boolean;
   activeVehicles: Set<string>;
 }
 
@@ -28,6 +29,7 @@ export const useAppStore = defineStore(
       menuOpen: true,
       showNight: true,
       showRoutes: false,
+      satelliteMap: false,
       activeVehicles: new Set()
     });
 

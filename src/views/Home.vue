@@ -7,7 +7,7 @@ import { GTFSService } from "@/api/services/gtfs";
 import { MapService } from "@/api/services/map";
 import { RouteService } from "@/api/services/route";
 import { StopsService } from "@/api/services/stops";
-import { POLLING_DURATION } from "@/constants/app";
+import { MapTypeEnum, POLLING_DURATION } from "@/constants/app";
 import {
   allBusLines,
   allTramLines,
@@ -212,6 +212,17 @@ watch(
   () => appStore.currentLocationTrigger,
   (val) => {
     mapService.goToLocation(val);
+  }
+);
+
+watch(
+  () => appStore.leftMenuFilters.satelliteMap,
+  (val) => {
+    if (val) {
+      mapService.changeMapType(MapTypeEnum.Satellite);
+    } else {
+      mapService.changeMapType(MapTypeEnum.Street);
+    }
   }
 );
 

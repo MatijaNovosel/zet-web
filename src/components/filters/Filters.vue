@@ -52,6 +52,16 @@
           <div class="route_display_label">Noćne linije</div>
         </template>
       </v-checkbox>
+      <v-checkbox
+        v-model="appStore.leftMenuFilters.satelliteMap"
+        hide-details
+        color="blue"
+        density="compact"
+      >
+        <template #label>
+          <div class="route_display_label">Satelitska mapa</div>
+        </template>
+      </v-checkbox>
     </div>
     <v-divider />
     <div class="vehicle_filters">

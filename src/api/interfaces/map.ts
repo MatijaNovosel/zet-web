@@ -14,6 +14,7 @@ export interface IMapService {
   ): void;
   removeVehicleMarker(marker: Marker, vehicleId: string): void;
   updateCurrentLocation(coords: [number, number]): void;
+  changeMapType(type: number): void;
 
   removeLayer(layer: LayerGroup): void;
   addLayer(layer: LayerGroup): void;
