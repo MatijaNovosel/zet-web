@@ -1,3 +1,4 @@
+import { POLLING_DURATION } from "@/constants/app";
 import { allBusLines, allTramLines, busLines, tramLines } from "@/constants/vehicle";
 import { defineStore } from "pinia";
 import { computed, reactive, ref } from "vue";
@@ -42,7 +43,7 @@ export const useAppStore = defineStore(
     };
 
     const startProgress = () => {
-      const duration = 8000;
+      const duration = POLLING_DURATION;
       const step = 100;
       const intervalMs = duration / step;
 

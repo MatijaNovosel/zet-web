@@ -15,7 +15,7 @@
           class="mr-5"
         >
           <v-icon
-            class="pulse"
+            class="spinPulse"
             size="15"
           >
             mdi-timer-sand
