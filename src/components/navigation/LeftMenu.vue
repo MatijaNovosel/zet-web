@@ -15,7 +15,7 @@
           class="mr-5"
         >
           <v-icon
-            class="pulse"
+            class="spinPulse"
             size="15"
           >
             mdi-timer-sand
@@ -61,7 +61,7 @@ const leftMenuStyle = computed(() => ({
   z-index: 999;
   top: 25px;
   left: 25px;
-  width: 275px;
+  width: 300px;
   border-radius: 8px;
 }
 </style>

@@ -4,8 +4,13 @@
 
 <script setup lang="ts">
 import { GTFSService } from "@/api/services/gtfs";
-import { DEFAULT_LOCATION, MAPTILER_KEY } from "@/constants/app";
+import { MapService } from "@/api/services/map";
+import { RouteService } from "@/api/services/route";
+import { StopsService } from "@/api/services/stops";
+import { MapTypeEnum, POLLING_DURATION } from "@/constants/app";
 import {
+  allBusLines,
+  allTramLines,
   busLines,
   nightBusLines,
   nightTramLines,
@@ -13,45 +18,35 @@ import {
   tramLines
 } from "@/constants/vehicle";
 import { getLineType } from "@/helpers/gtfs";
-import { animateMarkerMove } from "@/helpers/map";
-import { Leaflet } from "@/models/common";
+import { IGTFSEntityTripUpdateModel } from "@/models/gtfs";
+import { IStopModel } from "@/models/stop";
 import { IVehicleModel } from "@/models/vehicle";
 import { useAppStore } from "@/store/app";
-import { onMounted, reactive, watch } from "vue";
+import { onMounted, onUnmounted, reactive, watch } from "vue";
 
 interface IState {
   vehicles: IVehicleModel[];
+  tripUpdates: IGTFSEntityTripUpdateModel[];
+  stops: IStopModel[];
 }
 
 const appStore = useAppStore();
 
 const gtfsService = new GTFSService();
+const routeService = new RouteService();
+const mapService = new MapService();
+const stopsService = new StopsService();
 
 const state = reactive<IState>({
-  vehicles: []
+  vehicles: [],
+  tripUpdates: [],
+  stops: []
 });
 
-// @ts-ignore
-const leafletController = L as Leaflet;
-let map: any = null;
 let vehiclePollInterval: NodeJS.Timeout | null = null;
 
-const vehicleLayerGroups: any = {};
-const routeLayerGroups: any = {};
-
-const vehicleMarkerMap = new Map<string, any>();
-const routeLinestringMap = new Map<string, any>();
-
-const initMap = () => {
-  map = leafletController.map("map", { zoomControl: false });
-  map.setView(DEFAULT_LOCATION, 14);
-  leafletController.maptiler
-    .maptilerLayer({
-      apiKey: MAPTILER_KEY,
-      style: leafletController.maptiler.MapStyle.STREETS
-    })
-    .addTo(map);
-};
+// @ts-ignore
+const leafletInstance = L as any;
 
 const getColorByRouteId = (routeId: string | undefined) => {
   if (routeId) {
@@ -60,11 +55,16 @@ const getColorByRouteId = (routeId: string | undefined) => {
   return routeColors.default;
 };
 
-const getData = async (initial?: boolean) => {
+const getData = async () => {
   try {
     appStore.loadingData = true;
+
     const data = await gtfsService.getData();
     const vehicles = data.entity.filter((x) => "vehicle" in x);
+    const tripUpdates = data.entity.filter((x) => "tripUpdate" in x).map((x) => x.tripUpdate!);
+
+    state.tripUpdates = tripUpdates;
+
     state.vehicles = vehicles.map((x) => ({
       ...x.vehicle!,
       type: getLineType(x.vehicle!.trip.routeId)
@@ -72,135 +72,157 @@ const getData = async (initial?: boolean) => {
 
     for (const vehicle of state.vehicles) {
       const position = vehicle.position;
+      const routeId = vehicle.trip.routeId;
+      const color = getColorByRouteId(routeId);
+      const marker = mapService.getMarker(vehicle.vehicle.id);
 
-      if (initial) {
-        const routeId = vehicle.trip.routeId;
-        const color = getColorByRouteId(routeId);
-        const marker = leafletController.marker([position?.latitude, position?.longitude], {
-          icon: leafletController.divIcon({
-            html: `<div class="vehicle-marker" style="background-color: ${color};">${routeId}</div>`,
-            className: "",
-            iconSize: [35, 35]
-          })
-        });
-
-        vehicleMarkerMap.set(vehicle.vehicle.id, marker);
-        const layerGroup = vehicleLayerGroups[vehicle.trip.routeId];
-
-        if (layerGroup) {
-          marker.addTo(layerGroup);
-        }
+      if (!marker) {
+        mapService.addVehicleMarker(
+          vehicle.vehicle.id,
+          routeId,
+          [position.latitude, position.longitude],
+          color
+        );
       } else {
-        const marker = vehicleMarkerMap.get(vehicle.vehicle.id);
         if (marker) {
-          animateMarkerMove(marker, [position.latitude, position.longitude]);
+          mapService.animateMarkerToCoords(marker, [position.latitude, position.longitude]);
+          mapService.rotateMarker(
+            marker,
+            [position.latitude, position.longitude],
+            routeId,
+            color,
+            vehicle.vehicle.id
+          );
         }
       }
+      mapService.updateVisibleMarkers();
     }
+
+    const activeVehicleIds = state.vehicles.map((x) => x.vehicle.id);
+
+    mapService.vehicleMarkers.forEach((marker, vehicleId) => {
+      if (!activeVehicleIds.includes(vehicleId)) {
+        mapService.removeVehicleMarker(marker, vehicleId);
+      }
+    });
   } finally {
     appStore.loadingData = false;
   }
 };
 
 const pollData = async () => {
-  await getData(true);
+  await getData();
   appStore.startProgress();
   vehiclePollInterval = setInterval(async () => {
     await getData();
     appStore.startProgress();
-  }, 8000);
+  }, POLLING_DURATION);
 };
 
 const createLayers = () => {
-  [...tramLines, ...busLines, ...nightBusLines, ...nightTramLines].forEach((x) => {
-    vehicleLayerGroups[x] = leafletController.layerGroup();
-    routeLayerGroups[x] = leafletController.layerGroup();
-    vehicleLayerGroups[x].addTo(map);
-    routeLayerGroups[x].addTo(map);
+  [...tramLines, ...busLines, ...nightBusLines, ...nightTramLines].forEach((id) => {
+    mapService.addVehicleLayer(id);
+    mapService.addRouteLayer(id);
   });
+};
+
+const getStops = async () => {
+  const data = await stopsService.getStops();
+  state.stops = data;
+};
+
+const pollCurrentLocation = () => {
+  setInterval(() => {
+    navigator.geolocation.getCurrentPosition(
+      ({ coords }) => {
+        mapService.updateCurrentLocation([coords.latitude, coords.longitude]);
+      },
+      () => {
+        //
+      }
+    );
+  }, 5000);
 };
 
 watch(
   () => appStore.leftMenuFilters.showNight,
   (val) => {
-    if (val) {
-      Object.keys(vehicleLayerGroups).forEach((x) => {
-        const layer = vehicleLayerGroups[x];
-        if ([...nightBusLines, ...nightTramLines].includes(x)) {
-          map.addLayer(layer);
-        }
-      });
-    } else {
-      Object.keys(vehicleLayerGroups).forEach((x) => {
-        const layer = vehicleLayerGroups[x];
-        if ([...nightBusLines, ...nightTramLines].includes(x)) {
-          map.removeLayer(layer);
-        }
-      });
-    }
+    [...nightBusLines, ...nightTramLines].forEach((id) => {
+      const layer = mapService.getVehicleLayer(id);
+      if (layer) {
+        if (val) mapService.addLayer(layer);
+        else mapService.removeLayer(layer);
+      }
+    });
   }
 );
 
 watch(
   () => appStore.leftMenuFilters.activeVehicles,
-  (val) => {
-    const values = [...val];
-
-    Object.keys(vehicleLayerGroups).forEach((x) => {
-      const layer = vehicleLayerGroups[x];
-      map.addLayer(layer);
+  async (val) => {
+    const allRoutes = [...allTramLines, ...allBusLines];
+    allRoutes.forEach((id) => {
+      const vehicleLayer = mapService.getVehicleLayer(id);
+      const routeLayer = mapService.getRouteLayer(id);
+      if (vehicleLayer) mapService.removeLayer(vehicleLayer);
+      if (routeLayer) mapService.removeLayer(routeLayer);
     });
 
-    if (values.length) {
-      Object.keys(vehicleLayerGroups).forEach((x) => {
-        const layer = vehicleLayerGroups[x];
-        if (!values.includes(x)) {
-          map.removeLayer(layer);
+    if (val.size) {
+      for (const routeId of val) {
+        const vehicleLayer = mapService.getVehicleLayer(routeId);
+        if (vehicleLayer) mapService.addLayer(vehicleLayer);
+        const existingRouteLayer = mapService.getRouteLayer(routeId);
+        if (existingRouteLayer && existingRouteLayer.getLayers().length) {
+          mapService.addLayer(existingRouteLayer);
+        } else {
+          const data = await routeService.getRouteGeography(routeId);
+          mapService.addRouteGeography(routeId, data);
         }
+      }
+    } else {
+      allRoutes.forEach((id) => {
+        const vehicleLayer = mapService.getVehicleLayer(id);
+        if (vehicleLayer) mapService.addLayer(vehicleLayer);
+        const routeLayer = mapService.getRouteLayer(id);
+        if (routeLayer) mapService.removeLayer(routeLayer);
       });
     }
   },
-  {
-    deep: true
-  }
+  { deep: true }
 );
 
 watch(
   () => appStore.currentLocationTrigger,
   (val) => {
-    map.setView(val, 14);
+    mapService.goToLocation(val);
+  }
+);
+
+watch(
+  () => appStore.leftMenuFilters.satelliteMap,
+  (val) => {
+    if (val) {
+      mapService.changeMapType(MapTypeEnum.Satellite);
+    } else {
+      mapService.changeMapType(MapTypeEnum.Street);
+    }
   }
 );
 
 onMounted(async () => {
   appStore.loading = true;
-  initMap();
+  mapService.createMap(leafletInstance);
   createLayers();
   await pollData();
+  await getStops();
+  pollCurrentLocation();
   appStore.loading = false;
 });
+
+onUnmounted(() => {
+  if (vehiclePollInterval) {
+    clearInterval(vehiclePollInterval);
+  }
+});
 </script>
-
-<style lang="scss">
-#map {
-  height: 100%;
-}
-
-.vehicle-marker {
-  width: 35px;
-  height: 35px;
-  border-radius: 50%;
-  color: white;
-  font-weight: bold;
-  font-size: 12px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border: 2px solid white;
-  box-shadow: 0 0 5px rgba(0, 0, 0, 0.5);
-  text-align: center;
-  line-height: 15px;
-  font-weight: bold;
-  font-family: Roboto;
-}
-</style>

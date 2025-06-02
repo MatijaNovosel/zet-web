@@ -14,7 +14,7 @@
         width="16"
       >
         <v-icon
-          class="pulse"
+          class="spinPulse"
           size="70"
         >
           mdi-timer-sand
@@ -30,16 +30,13 @@
 <script setup lang="ts">
 import { onMounted } from "vue";
 import { useI18n } from "vue-i18n";
-import { useTheme } from "vuetify";
 import ConfirmationDialogProvider from "./components/confirmationDialog/ConfirmationDialogProvider.vue";
 import { useAppStore } from "./store/app";
 
 const appStore = useAppStore();
 const i18n = useI18n();
-const theme = useTheme();
 
 onMounted(() => {
-  theme.global.name.value = appStore.darkMode ? "dark" : "light";
   i18n.locale.value = appStore.language;
 });
 </script>

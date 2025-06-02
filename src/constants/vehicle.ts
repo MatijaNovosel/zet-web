@@ -16,10 +16,9 @@ export const tramLines = [
   "17"
 ];
 
-export const nightTramLines = ["31", "32", "33", "34", "35", "36", "37", "38", "39"];
+export const nightTramLines = ["31", "32", "33", "34"];
 
 export const nightBusLines = [
-  "301",
   "302",
   "303",
   "304",
@@ -143,8 +142,7 @@ export const busLines = [
   "284",
   "290",
   "308",
-  "310",
-  "315"
+  "310"
 ];
 
 export const allTramLines = [...tramLines, ...nightTramLines];
@@ -170,11 +168,6 @@ export const routeColors: Record<number | string, string> = {
   "32": "#ffbc00",
   "33": "#85ff00",
   "34": "#00ff37",
-  "35": "#3f51b5",
-  "36": "#004fff",
-  "37": "#6e00ff",
-  "38": "#ff00d4",
-  "39": "#ff0018",
   "102": "#e91e63",
   "103": "#9c27b0",
   "104": "#673ab7",
@@ -282,7 +275,6 @@ export const routeColors: Record<number | string, string> = {
   "283": "#ff5722",
   "284": "#795548",
   "290": "#9e9e9e",
-  "301": "#ff0000",
   "302": "#ff9700",
   "303": "#d1ff00",
   "304": "#3aff00",
@@ -295,6 +287,5 @@ export const routeColors: Record<number | string, string> = {
   "311": "#b900ff",
   "312": "#ff00af",
   "313": "#ff0018",
-  "315": "#9c27b0",
   default: "grey"
 };

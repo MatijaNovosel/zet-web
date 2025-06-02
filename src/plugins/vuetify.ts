@@ -13,6 +13,9 @@ export default createVuetify({
   blueprint: md3,
   components,
   directives,
+  theme: {
+    defaultTheme: "light"
+  },
   icons: {
     defaultSet: "mdi",
     sets: {

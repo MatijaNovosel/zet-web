@@ -3,10 +3,7 @@
     <alerts />
     <left-drawer v-if="mobile" />
     <left-menu v-else />
-    <v-main
-      class="main"
-      :class="theme.current.value.dark ? '' : 'bg-grey-lighten-4'"
-    >
+    <v-main class="main">
       <router-view />
     </v-main>
   </v-layout>
@@ -14,11 +11,9 @@
 
 <script setup lang="ts">
 import LeftDrawer from "@/components/navigation/LeftDrawer.vue";
-import { useDisplay, useTheme } from "vuetify";
+import { useDisplay } from "vuetify";
 import LeftMenu from "../components/navigation/LeftMenu.vue";
 import Alerts from "../components/notifications/Alerts.vue";
-
-const theme = useTheme();
 
 const { mobile } = useDisplay();
 </script>

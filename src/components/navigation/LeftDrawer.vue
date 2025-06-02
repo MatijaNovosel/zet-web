@@ -11,7 +11,6 @@
     :order="1"
     v-model="drawer"
     mobile
-    :class="theme.current.value.dark ? '' : 'bg-grey-lighten-5'"
   >
     <template #prepend>
       <v-list-item
@@ -26,7 +25,7 @@
             class="mr-5"
           >
             <v-icon
-              class="pulse"
+              class="spinPulse"
               size="15"
             >
               mdi-timer-sand
@@ -52,12 +51,11 @@
 <script lang="ts" setup>
 import { useAppStore } from "@/store/app";
 import { ref } from "vue";
-import { useDisplay, useTheme } from "vuetify";
+import { useDisplay } from "vuetify";
 import { version } from "../../../package.json";
 import Filters from "../filters/Filters.vue";
 
 const appStore = useAppStore();
-const theme = useTheme();
 const { mobile } = useDisplay();
 
 const drawer = ref(false);
@@ -70,7 +68,7 @@ const drawer = ref(false);
   z-index: 999;
   top: 25px;
   left: 25px;
-  width: 275px;
+  width: 300px;
   border-radius: 8px;
 }
 

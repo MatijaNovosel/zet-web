@@ -1,8 +1,8 @@
+import { POLLING_DURATION } from "@/constants/app";
 import { allBusLines, allTramLines, busLines, tramLines } from "@/constants/vehicle";
 import { defineStore } from "pinia";
 import { computed, reactive, ref } from "vue";
 import { useI18n } from "vue-i18n";
-import { useTheme } from "vuetify";
 
 interface ILeftMenuFilters {
   showBus: boolean;
@@ -10,6 +10,7 @@ interface ILeftMenuFilters {
   menuOpen: boolean;
   showNight: boolean;
   showRoutes: boolean;
+  satelliteMap: boolean;
   activeVehicles: Set<string>;
 }
 
@@ -20,8 +21,7 @@ export const useAppStore = defineStore(
     const loading = ref(false);
     const loadingData = ref(false);
     const language = ref("en");
-    const darkMode = ref(false);
-    const currentLocationTrigger = ref([0, 0]);
+    const currentLocationTrigger = ref<[number, number]>([0, 0]);
 
     const leftMenuFilters = reactive<ILeftMenuFilters>({
       showBus: true,
@@ -29,6 +29,7 @@ export const useAppStore = defineStore(
       menuOpen: true,
       showNight: true,
       showRoutes: false,
+      satelliteMap: false,
       activeVehicles: new Set()
     });
 
@@ -36,18 +37,7 @@ export const useAppStore = defineStore(
     let progressInterval: NodeJS.Timeout | undefined;
 
     // Composables
-    const theme = useTheme();
     const i18n = useI18n();
-
-    const toggleDarkMode = () => {
-      darkMode.value = !darkMode.value;
-      theme.global.name.value = darkMode.value ? "dark" : "light";
-    };
-
-    const setTheme = (value: string) => {
-      darkMode.value = value === "dark";
-      theme.global.name.value = darkMode.value ? "dark" : "light";
-    };
 
     const setLanguage = (lang: string) => {
       language.value = lang;
@@ -55,7 +45,7 @@ export const useAppStore = defineStore(
     };
 
     const startProgress = () => {
-      const duration = 8000;
+      const duration = POLLING_DURATION;
       const step = 100;
       const intervalMs = duration / step;
 
@@ -86,13 +76,20 @@ export const useAppStore = defineStore(
       }
     });
 
-    const moveToCurrentLocation = (coords: number[]) => {
+    const moveToCurrentLocation = (coords: [number, number]) => {
       currentLocationTrigger.value = coords;
+    };
+
+    const addToVehicleFilter = (value: string) => {
+      if (leftMenuFilters.activeVehicles.has(value)) {
+        leftMenuFilters.activeVehicles.delete(value);
+      } else {
+        leftMenuFilters.activeVehicles.add(value);
+      }
     };
 
     return {
       loading,
-      darkMode,
       language,
       loadingData,
       leftMenuFilters,
@@ -100,17 +97,16 @@ export const useAppStore = defineStore(
       busesToDisplay,
       progress,
       currentLocationTrigger,
+      addToVehicleFilter,
       moveToCurrentLocation,
       startProgress,
-      toggleDarkMode,
-      setTheme,
       setLanguage
     };
   },
   {
     persist: {
       storage: sessionStorage,
-      paths: ["darkMode", "language"]
+      paths: ["language"]
     }
   }
 );

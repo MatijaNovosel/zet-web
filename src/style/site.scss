@@ -1,75 +1,11 @@
-.v-input {
-  font-family: -apple-system, BlinkMacSystemFont, Segoe UI, Noto Sans, Helvetica, Arial, sans-serif,
-    Apple Color Emoji, Segoe UI Emoji !important;
-}
-
-.pos-rel {
-  position: relative;
-}
-
-.pos-static {
-  position: static;
-}
-
-/* Shading */
-
-.top-border-shaded {
-  border-top: 1px solid var(--shade) !important;
-}
-
-.right-border-shaded {
-  border-right: 1px solid var(--shade) !important;
-}
-
-.bottom-border-shaded {
-  border-bottom: 1px solid var(--shade) !important;
-}
-
-/* HTML component styling */
-
-::-webkit-scrollbar-thumb {
-  background-color: var(--light-grey);
-  border: 3px solid var(--light-grey);
-}
-
-audio::-webkit-media-controls-enclosure {
-  border-radius: 4px !important;
-}
-
-/* Other */
-
-.shaded-border {
-  border: 1px solid var(--shade);
+a[href="https://www.maptiler.com"]
+{
+  display: none !important;
 }
 
 .display-contents {
   display: contents;
 }
-
-.unselectable {
-  user-select: none;
-}
-
-.cursor-pointer {
-  cursor: pointer;
-}
-
-.rounded-borders {
-  border-radius: 8px !important;
-}
-
-/* Autofill input fix */
-.v-input .v-input__control .v-field-label--floating {
-  z-index: 1;
-}
-
-input:-webkit-autofill,
-input:-webkit-autofill:hover,
-input:-webkit-autofill:focus {
-  border-radius: 4px;
-}
-
-/* Transitions */
 
 .list-enter-active,
 .list-leave-active {
@@ -142,31 +78,6 @@ input:-webkit-autofill:focus {
   background: #8092f5;
 }
 
-.w-fit-content {
-  width: fit-content;
-}
-
-.h-fit-content {
-  height: fit-content;
-}
-
-@keyframes pulse {
-  0% {
-    transform: scale(0.75);
-  }
-  50% {
-    transform: scale(1);
-    rotate: 180deg;
-  }
-  100% {
-    transform: scale(0.75);
-  }
-}
-
-.pulse {
-  animation: pulse 2s infinite;
-}
-
 .flex-gap {
   gap: 12px;
 }
@@ -182,11 +93,107 @@ input:-webkit-autofill:focus {
   }
 }
 
-.outline {
-  border: 1px solid rgba(128, 128, 128, 0.29);
-  border-radius: 6px;
+.vehicle-marker {
+  width: 35px;
+  height: 35px;
+  position: relative;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+
+  &-text {
+    border-radius: 50%;
+    position: absolute;
+    color: white;
+    font-weight: bold;
+    font-size: 14px;
+    text-align: center;
+    line-height: 15px;
+    font-weight: bold;
+    font-family: Roboto;
+    width: 35px;
+    height: 35px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+  }
+
+  &-rotation {
+    border-radius: 50%;
+    z-index: -1;
+    position: absolute;
+    background-color: transparent;
+    width: 35px;
+    height: 35px;
+
+    &-arrow {
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 8px solid transparent;
+      border-right: 8px solid transparent;
+    }
+  }
 }
 
-.text-transform-inh {
-  text-transform: inherit;
+#map {
+  height: 100%;
+}
+
+.current-location-marker {
+  width: 20px;
+  height: 20px;
+  position: relative;
+  background-color: #4f9ef1;
+  border-radius: 50%;
+  box-shadow: 0 0 10px #007bffcc;
+  z-index: 99999 !important;
+}
+
+.current-location-marker::after {
+  content: "";
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background-color: #007bff80;
+  animation: pulse 1.5s ease-out infinite;
+  top: 0;
+  left: 0;
+  z-index: -1;
+}
+
+@keyframes pulse {
+  0% {
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  70% {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+  100% {
+    transform: scale(2.8);
+    opacity: 0;
+  }
+}
+
+.spinPulse {
+  animation: spinPulse 2s infinite;
+}
+
+@keyframes spinPulse {
+  0% {
+    transform: scale(0.75);
+  }
+  50% {
+    transform: scale(1);
+    rotate: 180deg;
+  }
+  100% {
+    transform: scale(0.75);
+  }
 }
