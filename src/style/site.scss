@@ -197,3 +197,11 @@ a[href="https://www.maptiler.com"]
     transform: scale(0.75);
   }
 }
+
+.stop-marker {
+  width: 20px;
+  height: 20px;
+  position: relative;
+  background-color: #4f9ef1;
+  border-radius: 50%;
+}

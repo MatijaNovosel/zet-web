@@ -129,6 +129,11 @@ const createLayers = () => {
 const getStops = async () => {
   const data = await stopsService.getStops();
   state.stops = data;
+  for (const stop of data) {
+    if (stop.parentStation) {
+      mapService.addStopMarker(stop.stopId, [stop.stopLat, stop.stopLon]);
+    }
+  }
 };
 
 const pollCurrentLocation = () => {
@@ -215,7 +220,7 @@ onMounted(async () => {
   mapService.createMap(leafletInstance);
   createLayers();
   await pollData();
-  await getStops();
+  // await getStops();
   pollCurrentLocation();
   appStore.loading = false;
 });

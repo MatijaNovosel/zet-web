@@ -12,6 +12,8 @@ export class MapService implements IMapService {
   currentLocationMarker: Marker | null = null;
   mapTilerLayer: any = null;
 
+  stopMarkers: Map<string, Marker> = new Map();
+
   vehicleMarkers: Map<string, Marker> = new Map();
   vehicleMarkerRotations: Map<string, number> = new Map();
   routeLinestrings: Map<string, Marker> = new Map();
@@ -73,6 +75,17 @@ export class MapService implements IMapService {
         marker.addTo(layer);
       } else if (!isVisible && isInLayer) {
         layer.removeLayer(marker);
+      }
+    });
+
+    this.stopMarkers.forEach((marker, id) => {
+      const latlng = marker.getLatLng();
+      const isVisible = bounds.contains(latlng);
+
+      if (isVisible) {
+        marker.addTo(this.map!);
+      } else {
+        marker.removeFrom(this.map!);
       }
     });
   }
@@ -262,6 +275,25 @@ export class MapService implements IMapService {
     if (layer && this.isInViewport(position)) {
       marker.addTo(layer);
     }
+  }
+
+  addStopMarker(id: string, position: [number, number]): void {
+    const marker = this.leafletInstance.marker(position, {
+      icon: this.leafletInstance.divIcon({
+        html: `
+          <div class="stop-marker"></div>
+        `,
+        className: "",
+        iconSize: [35, 35]
+      })
+    });
+
+    marker.addEventListener("click", () => {
+      //
+    });
+
+    this.stopMarkers.set(id, marker);
+    marker.addTo(this.map);
   }
 
   getMarker(id: string): Marker | undefined {
