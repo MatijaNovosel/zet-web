@@ -1,10 +1,11 @@
+import { IStopModel } from "@/models/stop";
 import { LayerGroup, Marker } from "leaflet";
 
 export interface IMapService {
-  createMap(leafletInstance: any): void;
+  createMap(): void;
   goToLocation(coords: [number, number]): void;
   updateMarkerCoords(marker: Marker, coords: [number, number]): void;
-  animateMarkerToCoords(marker: Marker, coords: [number, number], vehicleId: number): void;
+  animateMarkerToCoords(marker: Marker, coords: [number, number]): void;
   rotateMarker(
     marker: Marker,
     coords: [number, number],
@@ -36,5 +37,11 @@ export interface IMapService {
 
   getMarker(vehicleId: string): Marker | undefined;
 
+  addStopMarker(stop: IStopModel): void;
+
   isInViewport(coords: [number, number]): boolean;
+
+  updateVisibleMarkers(): void;
+  removeActiveStopMarker(): void;
+  getVehicleMarkers(): Map<string, Marker>;
 }

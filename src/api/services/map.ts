@@ -372,4 +372,8 @@ export class MapService implements IMapService {
   removeActiveStopMarker(): void {
     this.activeStopMarker?.removeFrom(this.map!);
   }
+
+  getVehicleMarkers(): Map<string, Marker> {
+    return this.vehicleMarkers;
+  }
 }

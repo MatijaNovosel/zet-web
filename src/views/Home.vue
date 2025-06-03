@@ -3,10 +3,10 @@
 </template>
 
 <script setup lang="ts">
-import { GTFSService } from "@/api/services/gtfs";
-import { MapService } from "@/api/services/map";
-import { RouteService } from "@/api/services/route";
-import { StopsService } from "@/api/services/stops";
+import { IGTFSService } from "@/api/interfaces/gtfs";
+import { IMapService } from "@/api/interfaces/map";
+import { IRouteService } from "@/api/interfaces/route";
+import { IStopsService } from "@/api/interfaces/stops";
 import { MapTypeEnum, POLLING_DURATION } from "@/constants/app";
 import {
   allBusLines,
@@ -17,6 +17,7 @@ import {
   routeColors,
   tramLines
 } from "@/constants/vehicle";
+import { getService, Types } from "@/di-container";
 import { getLineType } from "@/helpers/gtfs";
 import { IGTFSEntityTripUpdateModel } from "@/models/gtfs";
 import { IStopModel } from "@/models/stop";
@@ -32,10 +33,10 @@ interface IState {
 
 const appStore = useAppStore();
 
-const gtfsService = new GTFSService();
-const routeService = new RouteService();
-const mapService = new MapService();
-const stopsService = new StopsService();
+const gtfsService = getService<IGTFSService>(Types.GtfsService);
+const routeService = getService<IRouteService>(Types.RouteService);
+const mapService = getService<IMapService>(Types.MapService);
+const stopsService = getService<IStopsService>(Types.StopsService);
 
 const state = reactive<IState>({
   vehicles: [],
@@ -44,6 +45,7 @@ const state = reactive<IState>({
 });
 
 let vehiclePollInterval: NodeJS.Timeout | null = null;
+let currentLocationPollInterval: NodeJS.Timeout | null = null;
 
 const getColorByRouteId = (routeId: string | undefined) => {
   if (routeId) {
@@ -97,7 +99,9 @@ const getData = async () => {
 
     const activeVehicleIds = state.vehicles.map((x) => x.vehicle.id);
 
-    mapService.vehicleMarkers.forEach((marker, vehicleId) => {
+    const vehicleMarkers = mapService.getVehicleMarkers();
+
+    vehicleMarkers.forEach((marker, vehicleId) => {
       if (!activeVehicleIds.includes(vehicleId)) {
         mapService.removeVehicleMarker(marker, vehicleId);
       }
@@ -132,7 +136,7 @@ const getStops = async () => {
 };
 
 const pollCurrentLocation = () => {
-  setInterval(() => {
+  currentLocationPollInterval = setInterval(() => {
     navigator.geolocation.getCurrentPosition(
       ({ coords }) => {
         mapService.updateCurrentLocation([coords.latitude, coords.longitude]);
@@ -232,6 +236,9 @@ onMounted(async () => {
 });
 
 onUnmounted(() => {
+  if (vehiclePollInterval) {
+    clearInterval(vehiclePollInterval);
+  }
   if (vehiclePollInterval) {
     clearInterval(vehiclePollInterval);
   }
