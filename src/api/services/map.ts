@@ -2,6 +2,7 @@ import { DEFAULT_LOCATION, MAPTILER_KEY, MapTypeEnum, POLLING_DURATION } from "@
 import { routeColors } from "@/constants/vehicle";
 import { computeHeading } from "@/helpers/map";
 import { darkenHexColor } from "@/helpers/misc";
+import { IStopModel } from "@/models/stop";
 import { useAppStore } from "@/store/app";
 import { LayerGroup, Map as LeafletMap, Marker } from "leaflet";
 import { IMapService } from "./../interfaces/map";
@@ -13,6 +14,7 @@ export class MapService implements IMapService {
   mapTilerLayer: any = null;
 
   stopMarkers: Map<string, Marker> = new Map();
+  stopInfo: Map<string, IStopModel> = new Map();
 
   vehicleMarkers: Map<string, Marker> = new Map();
   vehicleMarkerRotations: Map<string, number> = new Map();
@@ -20,6 +22,8 @@ export class MapService implements IMapService {
 
   vehicleLayers: Map<string, LayerGroup> = new Map();
   routeLayers: Map<string, LayerGroup> = new Map();
+
+  stopLayer: LayerGroup | null = null;
 
   // Relacija vehicleId -> routeId
   vehicleRouteMap: Map<string, string> = new Map();
@@ -33,7 +37,7 @@ export class MapService implements IMapService {
         style = this.leafletInstance.maptiler.MapStyle.HYBRID;
         break;
       case MapTypeEnum.Street:
-        style = this.leafletInstance.maptiler.MapStyle.STREETS;
+        style = "01971d11-a093-74c8-8d48-9c0d0665a180";
         break;
     }
     this.mapTilerLayer.setStyle(style);
@@ -78,16 +82,21 @@ export class MapService implements IMapService {
       }
     });
 
-    this.stopMarkers.forEach((marker, id) => {
-      const latlng = marker.getLatLng();
-      const isVisible = bounds.contains(latlng);
+    if (this.map.getZoom() >= 16) {
+      this.map.addLayer(this.stopLayer!);
+      this.stopMarkers.forEach((marker, id) => {
+        const latlng = marker.getLatLng();
+        const isVisible = bounds.contains(latlng);
 
-      if (isVisible) {
-        marker.addTo(this.map!);
-      } else {
-        marker.removeFrom(this.map!);
-      }
-    });
+        if (isVisible) {
+          marker.addTo(this.map!);
+        } else {
+          marker.removeFrom(this.map!);
+        }
+      });
+    } else {
+      this.map.removeLayer(this.stopLayer!);
+    }
   }
 
   createMap(leafletInstance: any): void {
@@ -103,12 +112,13 @@ export class MapService implements IMapService {
     );
     const mapTilerLayer = leafletInstance.maptiler
       .maptilerLayer({
-        apiKey: MAPTILER_KEY,
-        style: leafletInstance.maptiler.MapStyle.STREETS
+        apiKey: MAPTILER_KEY
       })
       .addTo(this.map);
     this.mapTilerLayer = mapTilerLayer;
+    mapTilerLayer!.setStyle("01971d11-a093-74c8-8d48-9c0d0665a180");
     this.map!.on("moveend zoomend", () => this.updateVisibleMarkers());
+    this.stopLayer = this.leafletInstance.layerGroup();
   }
 
   goToLocation(coords: [number, number]): void {
@@ -277,8 +287,8 @@ export class MapService implements IMapService {
     }
   }
 
-  addStopMarker(id: string, position: [number, number]): void {
-    const marker = this.leafletInstance.marker(position, {
+  addStopMarker(stop: IStopModel): void {
+    const marker: Marker = this.leafletInstance.marker([stop.stopLat, stop.stopLon], {
       icon: this.leafletInstance.divIcon({
         html: `
           <div class="stop-marker"></div>
@@ -289,11 +299,13 @@ export class MapService implements IMapService {
     });
 
     marker.addEventListener("click", () => {
-      //
+      console.log(stop);
     });
 
-    this.stopMarkers.set(id, marker);
-    marker.addTo(this.map);
+    this.stopMarkers.set(stop.stopId, marker);
+    this.stopInfo.set(stop.stopId, stop);
+
+    marker.addTo(this.stopLayer!);
   }
 
   getMarker(id: string): Marker | undefined {

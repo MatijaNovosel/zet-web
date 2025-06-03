@@ -7,3 +7,5 @@ export enum MapTypeEnum {
   Street = 1,
   Satellite = 2
 }
+
+export const MINIMUM_ZOOM_LEVEL = 16;
