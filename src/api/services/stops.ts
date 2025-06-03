@@ -7,15 +7,9 @@ export class StopsService implements IStopsService {
     const { data } = await client.get("/stops");
     return data.map((x: any) => ({
       stopId: x.stop_id,
-      stopCode: x.stop_code,
       stopName: x.stop_name,
-      stopDesc: x.stop_desc,
       stopLat: x.stop_lat,
-      stopLon: x.stop_lon,
-      zoneId: x.zone_Id,
-      stopUrl: x.stop_url,
-      locationType: x.location_type,
-      parentStation: x.parent_station
+      stopLon: x.stop_lon
     }));
   }
 }

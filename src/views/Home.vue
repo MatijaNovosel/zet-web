@@ -130,9 +130,7 @@ const getStops = async () => {
   const data = await stopsService.getStops();
   state.stops = data;
   for (const stop of data) {
-    if (stop.parentStation) {
-      mapService.addStopMarker(stop);
-    }
+    mapService.addStopMarker(stop);
   }
 };
 
