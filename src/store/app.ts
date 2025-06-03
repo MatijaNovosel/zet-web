@@ -1,5 +1,6 @@
 import { POLLING_DURATION } from "@/constants/app";
 import { allBusLines, allTramLines, busLines, tramLines } from "@/constants/vehicle";
+import { IStopModel } from "@/models/stop";
 import { defineStore } from "pinia";
 import { computed, reactive, ref } from "vue";
 import { useI18n } from "vue-i18n";
@@ -20,8 +21,11 @@ export const useAppStore = defineStore(
     // Data
     const loading = ref(false);
     const loadingData = ref(false);
+    const rightMenu = ref(false);
     const language = ref("en");
+    const progress = ref(0);
     const currentLocationTrigger = ref<[number, number]>([0, 0]);
+    const activeStop = ref<IStopModel | null>(null);
 
     const leftMenuFilters = reactive<ILeftMenuFilters>({
       showBus: true,
@@ -33,7 +37,6 @@ export const useAppStore = defineStore(
       activeVehicles: new Set()
     });
 
-    const progress = ref(0);
     let progressInterval: NodeJS.Timeout | undefined;
 
     // Composables
@@ -42,6 +45,11 @@ export const useAppStore = defineStore(
     const setLanguage = (lang: string) => {
       language.value = lang;
       i18n.locale.value = lang;
+    };
+
+    const setActiveStop = (stop: IStopModel | null) => {
+      if (activeStop.value?.stopId === stop?.stopId) return;
+      activeStop.value = stop;
     };
 
     const startProgress = () => {
@@ -97,6 +105,9 @@ export const useAppStore = defineStore(
       busesToDisplay,
       progress,
       currentLocationTrigger,
+      rightMenu,
+      activeStop,
+      setActiveStop,
       addToVehicleFilter,
       moveToCurrentLocation,
       startProgress,

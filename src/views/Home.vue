@@ -148,6 +148,16 @@ const pollCurrentLocation = () => {
 };
 
 watch(
+  () => appStore.activeStop,
+  (val) => {
+    console.log(val);
+    if (!val) {
+      mapService.removeActiveStopMarker();
+    }
+  }
+);
+
+watch(
   () => appStore.leftMenuFilters.showNight,
   (val) => {
     [...nightBusLines, ...nightTramLines].forEach((id) => {

@@ -151,19 +151,19 @@ a[href="https://www.maptiler.com"]
   border-radius: 50%;
   box-shadow: 0 0 10px #007bffcc;
   z-index: 99999 !important;
-}
 
-.current-location-marker::after {
-  content: "";
-  position: absolute;
-  width: 100%;
-  height: 100%;
-  border-radius: 50%;
-  background-color: #007bff80;
-  animation: pulse 1.5s ease-out infinite;
-  top: 0;
-  left: 0;
-  z-index: -1;
+  &::after {
+    content: "";
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    background-color: #007bff80;
+    animation: pulse 1.5s ease-out infinite;
+    top: 0;
+    left: 0;
+    z-index: -1;
+  }
 }
 
 @keyframes pulse {
@@ -202,6 +202,25 @@ a[href="https://www.maptiler.com"]
   width: 20px;
   height: 20px;
   position: relative;
-  background-color: #4f9ef1;
+  background-color: #74abe6;
   border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
+
+  &.active {
+    background-color: #4cc540;
+    z-index: 19999 !important;
+
+    &::after {
+      content: "";
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      border-radius: 50%;
+      background-color: #398d32;
+      animation: pulse 1.5s ease-out infinite;
+      top: 0;
+      left: 0;
+      z-index: -1;
+    }
+  }
 }

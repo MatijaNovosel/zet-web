@@ -11,6 +11,7 @@ export class MapService implements IMapService {
   map: LeafletMap | null = null;
   appStore: any;
   currentLocationMarker: Marker | null = null;
+  activeStopMarker: Marker | null = null;
   mapTilerLayer: any = null;
 
   stopMarkers: Map<string, Marker> = new Map();
@@ -49,7 +50,8 @@ export class MapService implements IMapService {
         icon: this.leafletInstance.divIcon({
           className: "current-location-marker",
           iconSize: [20, 20]
-        })
+        }),
+        pane: "priorityMarkers"
       });
       this.currentLocationMarker = marker;
       this.currentLocationMarker?.addTo(this.map!);
@@ -119,6 +121,22 @@ export class MapService implements IMapService {
     mapTilerLayer!.setStyle("01971d11-a093-74c8-8d48-9c0d0665a180");
     this.map!.on("moveend zoomend", () => this.updateVisibleMarkers());
     this.stopLayer = this.leafletInstance.layerGroup();
+
+    this.map!.createPane("priorityMarkers");
+    this.map!.getPane("priorityMarkers")!.style.zIndex = "9999";
+
+    const marker: Marker = this.leafletInstance.marker([0, 0], {
+      icon: this.leafletInstance.divIcon({
+        html: `
+          <div class="stop-marker active"></div>
+        `,
+        className: "",
+        iconSize: [35, 35]
+      }),
+      pane: "priorityMarkers"
+    });
+
+    this.activeStopMarker = marker;
   }
 
   goToLocation(coords: [number, number]): void {
@@ -299,7 +317,12 @@ export class MapService implements IMapService {
     });
 
     marker.addEventListener("click", () => {
-      console.log(stop);
+      if (!this.appStore.activeStop) {
+        this.activeStopMarker?.addTo(this.map!);
+      }
+      this.activeStopMarker!.setLatLng([stop.stopLat, stop.stopLon]);
+      this.appStore.setActiveStop(stop);
+      this.goToLocation([stop.stopLat, stop.stopLon]);
     });
 
     this.stopMarkers.set(stop.stopId, marker);
@@ -330,5 +353,9 @@ export class MapService implements IMapService {
   isInViewport(coords: [number, number]): boolean {
     if (!this.map) return false;
     return this.map.getBounds().contains(coords);
+  }
+
+  removeActiveStopMarker(): void {
+    this.activeStopMarker?.removeFrom(this.map!);
   }
 }
