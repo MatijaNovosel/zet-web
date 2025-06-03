@@ -151,7 +151,6 @@ const pollCurrentLocation = () => {
 watch(
   () => appStore.activeStop,
   (val) => {
-    console.log(val);
     if (!val) {
       mapService.removeActiveStopMarker();
     }
