@@ -84,7 +84,7 @@ export class MapService implements IMapService {
       }
     });
 
-    if (this.map.getZoom() >= 16) {
+    if (this.map.getZoom() >= 15.5) {
       this.map.addLayer(this.stopLayer!);
       this.stopMarkers.forEach((marker, id) => {
         const latlng = marker.getLatLng();
