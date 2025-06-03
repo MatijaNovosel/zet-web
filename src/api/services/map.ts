@@ -4,7 +4,19 @@ import { computeHeading } from "@/helpers/map";
 import { darkenHexColor } from "@/helpers/misc";
 import { IStopModel } from "@/models/stop";
 import { useAppStore } from "@/store/app";
-import { LayerGroup, Map as LeafletMap, Marker } from "leaflet";
+import {
+  divIcon,
+  geoJSON,
+  latLng,
+  layerGroup,
+  LayerGroup,
+  Map as LeafletMap,
+  map,
+  marker,
+  Marker,
+  TileLayer,
+  tileLayer
+} from "leaflet";
 import { IMapService } from "./../interfaces/map";
 
 export class MapService implements IMapService {
@@ -12,7 +24,6 @@ export class MapService implements IMapService {
   appStore: any;
   currentLocationMarker: Marker | null = null;
   activeStopMarker: Marker | null = null;
-  mapTilerLayer: any = null;
 
   stopMarkers: Map<string, Marker> = new Map();
   stopInfo: Map<string, IStopModel> = new Map();
@@ -29,31 +40,31 @@ export class MapService implements IMapService {
   // Relacija vehicleId -> routeId
   vehicleRouteMap: Map<string, string> = new Map();
 
-  leafletInstance: any;
+  tileLayer: TileLayer | null = null;
 
   changeMapType(type: number): void {
-    let style = null;
+    let style = "";
     switch (type) {
       case MapTypeEnum.Satellite:
-        style = this.leafletInstance.maptiler.MapStyle.HYBRID;
+        style = `https://api.maptiler.com/maps/satellite/{z}/{x}/{y}@2x.jpg?key=${MAPTILER_KEY}`;
         break;
       case MapTypeEnum.Street:
-        style = "01971d11-a093-74c8-8d48-9c0d0665a180";
+        style = `https://api.maptiler.com/maps/basic-v2/{z}/{x}/{y}@2x.png?key=${MAPTILER_KEY}`;
         break;
     }
-    this.mapTilerLayer.setStyle(style);
+    this.tileLayer?.setUrl(style);
   }
 
   updateCurrentLocation(coords: [number, number]): void {
     if (!this.currentLocationMarker) {
-      const marker = this.leafletInstance.marker(coords, {
-        icon: this.leafletInstance.divIcon({
+      const newMarker = marker(coords, {
+        icon: divIcon({
           className: "current-location-marker",
           iconSize: [20, 20]
         }),
         pane: "priorityMarkers"
       });
-      this.currentLocationMarker = marker;
+      this.currentLocationMarker = newMarker;
       this.currentLocationMarker?.addTo(this.map!);
       return;
     }
@@ -101,32 +112,34 @@ export class MapService implements IMapService {
     }
   }
 
-  createMap(leafletInstance: any): void {
+  createMap(): void {
     this.appStore = useAppStore();
-    this.leafletInstance = leafletInstance;
-    this.map = leafletInstance.map("map", { zoomControl: false });
-    this.map!.setView(
+    this.map = map("map", {
+      zoomControl: false,
+      center: latLng(DEFAULT_LOCATION[0], DEFAULT_LOCATION[1]),
+      zoom: 14
+    });
+
+    this.tileLayer = tileLayer(
+      `https://api.maptiler.com/maps/basic-v2/{z}/{x}/{y}@2x.png?key=${MAPTILER_KEY}`,
       {
-        lat: DEFAULT_LOCATION[0],
-        lng: DEFAULT_LOCATION[1]
-      },
-      14
+        crossOrigin: true,
+        tileSize: 512,
+        zoomOffset: -1,
+        minZoom: 1
+      }
     );
-    const mapTilerLayer = leafletInstance.maptiler
-      .maptilerLayer({
-        apiKey: MAPTILER_KEY
-      })
-      .addTo(this.map);
-    this.mapTilerLayer = mapTilerLayer;
-    mapTilerLayer!.setStyle("01971d11-a093-74c8-8d48-9c0d0665a180");
+
+    this.tileLayer!.addTo(this.map!);
+
     this.map!.on("moveend zoomend", () => this.updateVisibleMarkers());
-    this.stopLayer = this.leafletInstance.layerGroup();
+    this.stopLayer = layerGroup();
 
     this.map!.createPane("priorityMarkers");
     this.map!.getPane("priorityMarkers")!.style.zIndex = "9999";
 
-    const marker: Marker = this.leafletInstance.marker([0, 0], {
-      icon: this.leafletInstance.divIcon({
+    const newMarker = marker([0, 0], {
+      icon: divIcon({
         html: `
           <div class="stop-marker active"></div>
         `,
@@ -136,7 +149,7 @@ export class MapService implements IMapService {
       pane: "priorityMarkers"
     });
 
-    this.activeStopMarker = marker;
+    this.activeStopMarker = newMarker;
   }
 
   goToLocation(coords: [number, number]): void {
@@ -199,7 +212,7 @@ export class MapService implements IMapService {
     const arrowColor = darkenHexColor(color, 15);
     const previousRotation = this.vehicleMarkerRotations.get(vehicleId);
 
-    const newIcon = this.leafletInstance.divIcon({
+    const newIcon = divIcon({
       html: `
           <div class="vehicle-marker">
             <div class="vehicle-marker-text" style="background-color: ${color};">
@@ -245,12 +258,12 @@ export class MapService implements IMapService {
     let layer = this.routeLayers.get(id);
 
     if (!layer) {
-      layer = this.leafletInstance.layerGroup();
+      layer = layerGroup();
       this.routeLayers.set(id, layer!);
     }
 
     if (!layer!.getLayers().length) {
-      const routeGeoJsonLayer = this.leafletInstance.geoJSON(geography, {
+      const routeGeoJsonLayer = geoJSON(geography, {
         style: {
           color: routeColors[id],
           weight: 5,
@@ -266,7 +279,7 @@ export class MapService implements IMapService {
   }
 
   addRouteLayer(id: string): void {
-    const layer: LayerGroup = this.leafletInstance.layerGroup();
+    const layer: LayerGroup = layerGroup();
     layer.addTo(this.map!);
     this.routeLayers.set(id, layer);
   }
@@ -277,8 +290,8 @@ export class MapService implements IMapService {
     position: [number, number],
     color: string
   ): void {
-    const marker = this.leafletInstance.marker(position, {
-      icon: this.leafletInstance.divIcon({
+    const newMarker = marker(position, {
+      icon: divIcon({
         html: `
           <div class="vehicle-marker" style="background-color: ${color};">
             <div class="vehicle-marker-text">
@@ -293,21 +306,22 @@ export class MapService implements IMapService {
       })
     });
 
-    marker.addEventListener("click", () => {
+    newMarker.addEventListener("click", () => {
       this.appStore.addToVehicleFilter(routeId);
     });
 
-    this.vehicleMarkers.set(vehicleId, marker);
+    this.vehicleMarkers.set(vehicleId, newMarker);
     this.vehicleRouteMap.set(vehicleId, routeId);
     const layer = this.getVehicleLayer(routeId);
+
     if (layer && this.isInViewport(position)) {
-      marker.addTo(layer);
+      newMarker.addTo(layer);
     }
   }
 
   addStopMarker(stop: IStopModel): void {
-    const marker: Marker = this.leafletInstance.marker([stop.stopLat, stop.stopLon], {
-      icon: this.leafletInstance.divIcon({
+    const newMarker = marker([stop.stopLat, stop.stopLon], {
+      icon: divIcon({
         html: `
           <div class="stop-marker"></div>
         `,
@@ -316,7 +330,7 @@ export class MapService implements IMapService {
       })
     });
 
-    marker.addEventListener("click", () => {
+    newMarker.addEventListener("click", () => {
       if (!this.appStore.activeStop) {
         this.activeStopMarker?.addTo(this.map!);
       }
@@ -325,10 +339,10 @@ export class MapService implements IMapService {
       this.goToLocation([stop.stopLat, stop.stopLon]);
     });
 
-    this.stopMarkers.set(stop.stopId, marker);
+    this.stopMarkers.set(stop.stopId, newMarker);
     this.stopInfo.set(stop.stopId, stop);
 
-    marker.addTo(this.stopLayer!);
+    newMarker.addTo(this.stopLayer!);
   }
 
   getMarker(id: string): Marker | undefined {
@@ -336,7 +350,7 @@ export class MapService implements IMapService {
   }
 
   addVehicleLayer(id: string): void {
-    const layer: LayerGroup = this.leafletInstance.layerGroup();
+    const layer = layerGroup();
     layer.addTo(this.map!);
     this.vehicleLayers.set(id, layer);
   }

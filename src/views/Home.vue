@@ -45,9 +45,6 @@ const state = reactive<IState>({
 
 let vehiclePollInterval: NodeJS.Timeout | null = null;
 
-// @ts-ignore
-const leafletInstance = L as any;
-
 const getColorByRouteId = (routeId: string | undefined) => {
   if (routeId) {
     return routeColors[routeId] || routeColors.default;
@@ -225,7 +222,7 @@ watch(
 
 onMounted(async () => {
   appStore.loading = true;
-  mapService.createMap(leafletInstance);
+  mapService.createMap();
   createLayers();
   await getStops();
   await pollData();
