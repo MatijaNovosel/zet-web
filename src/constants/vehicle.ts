@@ -141,9 +141,7 @@ export const busLines = [
   "282",
   "283",
   "284",
-  "290",
-  "308",
-  "310"
+  "290"
 ];
 
 export const allTramLines = [...tramLines, ...nightTramLines];
