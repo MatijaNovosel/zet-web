@@ -157,7 +157,11 @@ export class MapService implements IMapService {
 
   goToLocation(coords: [number, number], animate = true): void {
     const center = this.map!.getCenter();
-    if (center.lat === coords[0] && center.lng === coords[1]) return;
+    const target = latLng(coords[0], coords[1]);
+
+    const distance = this.map!.distance(center, target);
+
+    if (distance < 3) return;
 
     this.map!.flyTo(coords, 18, {
       animate,
