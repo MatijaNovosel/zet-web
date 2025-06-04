@@ -4,7 +4,7 @@
     <left-drawer v-if="mobile" />
     <template v-else>
       <left-menu />
-      <right-menu v-if="appStore.activeStop" />
+      <right-menu v-if="appStore.activeStop || appStore.activeVehicle" />
     </template>
     <v-main class="main">
       <router-view />

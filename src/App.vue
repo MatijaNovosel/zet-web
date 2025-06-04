@@ -28,15 +28,8 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted } from "vue";
-import { useI18n } from "vue-i18n";
 import ConfirmationDialogProvider from "./components/confirmationDialog/ConfirmationDialogProvider.vue";
 import { useAppStore } from "./store/app";
 
 const appStore = useAppStore();
-const i18n = useI18n();
-
-onMounted(() => {
-  i18n.locale.value = appStore.language;
-});
 </script>

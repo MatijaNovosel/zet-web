@@ -14,7 +14,6 @@ import {
   busLines,
   nightBusLines,
   nightTramLines,
-  routeColors,
   tramLines
 } from "@/constants/vehicle";
 import { getService, Types } from "@/di-container";
@@ -47,13 +46,6 @@ const state = reactive<IState>({
 let vehiclePollInterval: NodeJS.Timeout | null = null;
 let currentLocationPollInterval: NodeJS.Timeout | null = null;
 
-const getColorByRouteId = (routeId: string | undefined) => {
-  if (routeId) {
-    return routeColors[routeId] || routeColors.default;
-  }
-  return routeColors.default;
-};
-
 const getData = async () => {
   try {
     appStore.loadingData = true;
@@ -70,28 +62,17 @@ const getData = async () => {
     }));
 
     for (const vehicle of state.vehicles) {
-      const position = vehicle.position;
-      const routeId = vehicle.trip.routeId;
-      const color = getColorByRouteId(routeId);
       const marker = mapService.getMarker(vehicle.vehicle.id);
 
       if (!marker) {
-        mapService.addVehicleMarker(
-          vehicle.vehicle.id,
-          routeId,
-          [position.latitude, position.longitude],
-          color
-        );
+        mapService.addVehicleMarker(vehicle);
       } else {
         if (marker) {
-          mapService.animateMarkerToCoords(marker, [position.latitude, position.longitude]);
-          mapService.rotateMarker(
-            marker,
-            [position.latitude, position.longitude],
-            routeId,
-            color,
-            vehicle.vehicle.id
-          );
+          mapService.animateMarkerToCoords(marker, [
+            vehicle.position.latitude,
+            vehicle.position.longitude
+          ]);
+          mapService.rotateVehicleMarker(marker, vehicle);
         }
       }
       mapService.updateVisibleMarkers();
@@ -171,7 +152,7 @@ watch(
 );
 
 watch(
-  () => appStore.leftMenuFilters.activeVehicles,
+  () => appStore.leftMenuFilters.activeRoutes,
   async (val) => {
     const allRoutes = [...allTramLines, ...allBusLines];
     allRoutes.forEach((id) => {
@@ -206,13 +187,6 @@ watch(
 );
 
 watch(
-  () => appStore.currentLocationTrigger,
-  (val) => {
-    mapService.goToLocation(val);
-  }
-);
-
-watch(
   () => appStore.leftMenuFilters.satelliteMap,
   (val) => {
     if (val) {
@@ -238,8 +212,8 @@ onUnmounted(() => {
   if (vehiclePollInterval) {
     clearInterval(vehiclePollInterval);
   }
-  if (vehiclePollInterval) {
-    clearInterval(vehiclePollInterval);
+  if (currentLocationPollInterval) {
+    clearInterval(currentLocationPollInterval);
   }
 });
 </script>

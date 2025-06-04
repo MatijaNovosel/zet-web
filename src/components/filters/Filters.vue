@@ -10,6 +10,7 @@
         variant="text"
         size="30px"
         :color="allBusesShowing ? 'blue' : 'grey'"
+        :disabled="shouldDisableControls"
         @click="toggleBuses"
       >
         <v-tooltip activator="parent"> Prikaži autobuse </v-tooltip>
@@ -22,6 +23,7 @@
         variant="text"
         size="30px"
         :color="allTramsShowing ? 'blue' : 'grey'"
+        :disabled="shouldDisableControls"
         @click="toggleTrams"
       >
         <v-tooltip activator="parent"> Prikaži tramvaje </v-tooltip>
@@ -39,6 +41,19 @@
         <v-tooltip activator="parent"> Idi na moju lokaciju </v-tooltip>
         <v-icon> mdi-crosshairs-gps </v-icon>
       </v-btn>
+      <v-btn
+        class="ml-3"
+        icon
+        flat
+        variant="text"
+        size="30px"
+        :color="filtersActive ? 'blue-lighten-1' : 'grey'"
+        :disabled="shouldDisableControls"
+        @click="clearFilters"
+      >
+        <v-tooltip activator="parent"> Ukloni filtriranje </v-tooltip>
+        <v-icon> mdi-filter-remove </v-icon>
+      </v-btn>
     </div>
     <v-divider />
     <div class="d-flex pl-2 py-1 ga-2">
@@ -47,6 +62,7 @@
         hide-details
         color="blue"
         density="compact"
+        :disabled="shouldDisableControls"
       >
         <template #label>
           <div class="route_display_label">Noćne linije</div>
@@ -72,7 +88,7 @@
             v-for="tram in appStore.tramsToDisplay"
             :key="tram"
             :text="tram"
-            :active="appStore.leftMenuFilters.activeVehicles.has(tram)"
+            :active="appStore.leftMenuFilters.activeRoutes.has(tram)"
             :color="routeColors[tram]"
             @click="addToFilter(tram)"
           />
@@ -86,7 +102,7 @@
             v-for="bus in appStore.busesToDisplay"
             :key="bus"
             :text="bus"
-            :active="appStore.leftMenuFilters.activeVehicles.has(bus)"
+            :active="appStore.leftMenuFilters.activeRoutes.has(bus)"
             :color="routeColors[bus]"
             @click="addToFilter(bus)"
           />
@@ -97,7 +113,9 @@
 </template>
 
 <script lang="ts" setup>
+import { IMapService } from "@/api/interfaces/map";
 import { allBusLines, allTramLines, routeColors } from "@/constants/vehicle";
+import { getService, Types } from "@/di-container";
 import { useAppStore } from "@/store/app";
 import { computed } from "vue";
 import { useDisplay } from "vuetify";
@@ -105,9 +123,12 @@ import FilterChip from "./FilterChip.vue";
 
 const appStore = useAppStore();
 const { mobile } = useDisplay();
+const mapService = getService<IMapService>(Types.MapService);
 
 const addToFilter = (value: string) => {
-  appStore.addToVehicleFilter(value);
+  if (!appStore.activeVehicle) {
+    appStore.addToRoutesFilter(value);
+  }
 };
 
 const filtersStyle = computed(() => ({
@@ -115,29 +136,41 @@ const filtersStyle = computed(() => ({
 }));
 
 const allTramsShowing = computed(() => {
-  return allTramLines.every((x) => appStore.leftMenuFilters.activeVehicles.has(x));
+  return allTramLines.every((x) => appStore.leftMenuFilters.activeRoutes.has(x));
 });
 
 const allBusesShowing = computed(() => {
-  return allBusLines.every((x) => appStore.leftMenuFilters.activeVehicles.has(x));
+  return allBusLines.every((x) => appStore.leftMenuFilters.activeRoutes.has(x));
+});
+
+const filtersActive = computed(() => {
+  return appStore.leftMenuFilters.activeRoutes.size;
+});
+
+const clearFilters = () => {
+  appStore.leftMenuFilters.activeRoutes.clear();
+};
+
+const shouldDisableControls = computed(() => {
+  return appStore.activeVehicle !== null;
 });
 
 const toggleBuses = () => {
   if (allBusesShowing.value) {
-    allBusLines.forEach((x) => appStore.leftMenuFilters.activeVehicles.delete(x));
+    allBusLines.forEach((x) => appStore.leftMenuFilters.activeRoutes.delete(x));
   } else {
     allBusLines.forEach((x) => {
-      appStore.leftMenuFilters.activeVehicles.add(x);
+      appStore.leftMenuFilters.activeRoutes.add(x);
     });
   }
 };
 
 const toggleTrams = () => {
   if (allTramsShowing.value) {
-    allTramLines.forEach((x) => appStore.leftMenuFilters.activeVehicles.delete(x));
+    allTramLines.forEach((x) => appStore.leftMenuFilters.activeRoutes.delete(x));
   } else {
     allTramLines.forEach((x) => {
-      appStore.leftMenuFilters.activeVehicles.add(x);
+      appStore.leftMenuFilters.activeRoutes.add(x);
     });
   }
 };
@@ -145,7 +178,7 @@ const toggleTrams = () => {
 const goToCurrentLocation = () => {
   navigator.geolocation.getCurrentPosition(
     (position) => {
-      appStore.moveToCurrentLocation([position.coords.latitude, position.coords.longitude]);
+      mapService.goToLocation([position.coords.latitude, position.coords.longitude]);
     },
     () => {
       //

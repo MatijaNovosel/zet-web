@@ -1,8 +1,9 @@
 import { DEFAULT_LOCATION, MAPTILER_KEY, MapTypeEnum, POLLING_DURATION } from "@/constants/app";
 import { routeColors } from "@/constants/vehicle";
 import { computeHeading } from "@/helpers/map";
-import { darkenHexColor } from "@/helpers/misc";
+import { darkenHexColor, getColorByRouteId } from "@/helpers/misc";
 import { IStopModel } from "@/models/stop";
+import { IVehicleModel } from "@/models/vehicle";
 import { useAppStore } from "@/store/app";
 import {
   divIcon,
@@ -21,7 +22,7 @@ import { IMapService } from "./../interfaces/map";
 
 export class MapService implements IMapService {
   map: LeafletMap | null = null;
-  appStore: any;
+  appStore: ReturnType<typeof useAppStore> | null = null;
   currentLocationMarker: Marker | null = null;
   activeStopMarker: Marker | null = null;
 
@@ -41,6 +42,8 @@ export class MapService implements IMapService {
   vehicleRouteMap: Map<string, string> = new Map();
 
   tileLayer: TileLayer | null = null;
+
+  followMarkerInterval: NodeJS.Timeout | null = null;
 
   changeMapType(type: number): void {
     let style = "";
@@ -113,7 +116,6 @@ export class MapService implements IMapService {
   }
 
   createMap(): void {
-    this.appStore = useAppStore();
     this.map = map("map", {
       zoomControl: false,
       center: latLng(DEFAULT_LOCATION[0], DEFAULT_LOCATION[1]),
@@ -150,12 +152,16 @@ export class MapService implements IMapService {
     });
 
     this.activeStopMarker = newMarker;
+    this.appStore = useAppStore();
   }
 
-  goToLocation(coords: [number, number]): void {
+  goToLocation(coords: [number, number], animate = true): void {
+    const center = this.map!.getCenter();
+    if (center.lat === coords[0] && center.lng === coords[1]) return;
+
     this.map!.flyTo(coords, 18, {
-      animate: true,
-      duration: 1
+      animate,
+      duration: 0.5
     });
   }
 
@@ -192,31 +198,27 @@ export class MapService implements IMapService {
     requestAnimationFrame(animate);
   }
 
-  rotateMarker(
-    marker: Marker,
-    coords: [number, number],
-    routeId: string,
-    color: string,
-    vehicleId: string
-  ): void {
+  rotateVehicleMarker(marker: Marker, vehicle: IVehicleModel): void {
     const rotation = computeHeading(
       {
         ...marker.getLatLng()
       },
       {
-        lat: coords[0],
-        lng: coords[1]
+        lat: vehicle.position.latitude,
+        lng: vehicle.position.longitude
       }
     );
 
+    const color = getColorByRouteId(vehicle.trip.routeId);
     const arrowColor = darkenHexColor(color, 15);
-    const previousRotation = this.vehicleMarkerRotations.get(vehicleId);
+    const previousRotation = this.vehicleMarkerRotations.get(vehicle.vehicle.id);
+    const isActive = this.appStore?.activeVehicle?.vehicle.id === vehicle.vehicle.id;
 
     const newIcon = divIcon({
       html: `
-          <div class="vehicle-marker">
+          <div class="vehicle-marker ${isActive ? "active" : ""}">
             <div class="vehicle-marker-text" style="background-color: ${color};">
-              ${routeId}
+              ${vehicle.trip.routeId}
             </div>
             <div class="vehicle-marker-rotation" style="transform: rotate(${rotation}deg)">
               <div class="vehicle-marker-rotation-arrow" style="border-bottom: 12px solid ${arrowColor};"></div>
@@ -229,11 +231,11 @@ export class MapService implements IMapService {
 
     if (previousRotation) {
       if (previousRotation !== rotation && rotation !== 0) {
-        this.vehicleMarkerRotations.set(vehicleId, rotation);
+        this.vehicleMarkerRotations.set(vehicle.vehicle.id, rotation);
         marker.setIcon(newIcon);
       }
     } else {
-      this.vehicleMarkerRotations.set(vehicleId, rotation);
+      this.vehicleMarkerRotations.set(vehicle.vehicle.id, rotation);
       marker.setIcon(newIcon);
     }
   }
@@ -284,18 +286,15 @@ export class MapService implements IMapService {
     this.routeLayers.set(id, layer);
   }
 
-  addVehicleMarker(
-    vehicleId: string,
-    routeId: string,
-    position: [number, number],
-    color: string
-  ): void {
-    const newMarker = marker(position, {
+  addVehicleMarker(vehicle: IVehicleModel): void {
+    const color = getColorByRouteId(vehicle.trip.routeId);
+
+    const newMarker = marker([vehicle.position.latitude, vehicle.position.longitude], {
       icon: divIcon({
         html: `
           <div class="vehicle-marker" style="background-color: ${color};">
             <div class="vehicle-marker-text">
-              ${routeId}
+              ${vehicle.trip.routeId}
             </div>
             <div class="vehicle-marker-rotation">
           </div>
@@ -307,14 +306,24 @@ export class MapService implements IMapService {
     });
 
     newMarker.addEventListener("click", () => {
-      this.appStore.addToVehicleFilter(routeId);
+      this.appStore?.leftMenuFilters.activeRoutes.clear();
+
+      if (!this.appStore?.leftMenuFilters.activeRoutes.has(vehicle.trip.routeId)) {
+        this.appStore!.addToRoutesFilter(vehicle.trip.routeId);
+      }
+
+      this.appStore?.setActiveVehicle(vehicle);
+      this.appStore!.setActiveStop(null);
+      this.appStore!.trackingVehicle = false;
+
+      this.goToLocation([newMarker.getLatLng().lat, newMarker.getLatLng().lng]);
     });
 
-    this.vehicleMarkers.set(vehicleId, newMarker);
-    this.vehicleRouteMap.set(vehicleId, routeId);
-    const layer = this.getVehicleLayer(routeId);
+    this.vehicleMarkers.set(vehicle.vehicle.id, newMarker);
+    this.vehicleRouteMap.set(vehicle.vehicle.id, vehicle.trip.routeId);
+    const layer = this.getVehicleLayer(vehicle.trip.routeId);
 
-    if (layer && this.isInViewport(position)) {
+    if (layer && this.isInViewport([vehicle.position.latitude, vehicle.position.longitude])) {
       newMarker.addTo(layer);
     }
   }
@@ -331,11 +340,18 @@ export class MapService implements IMapService {
     });
 
     newMarker.addEventListener("click", () => {
-      if (!this.appStore.activeStop) {
+      if (!this.appStore!.activeStop) {
         this.activeStopMarker?.addTo(this.map!);
       }
       this.activeStopMarker!.setLatLng([stop.stopLat, stop.stopLon]);
-      this.appStore.setActiveStop(stop);
+      this.appStore!.setActiveStop(stop);
+
+      this.appStore!.setActiveVehicle(null);
+      this.removeActiveVehicle();
+      if (this.appStore!.trackingVehicle) {
+        this.stopTrackingVehicle();
+      }
+
       this.goToLocation([stop.stopLat, stop.stopLon]);
     });
 
@@ -375,5 +391,45 @@ export class MapService implements IMapService {
 
   getVehicleMarkers(): Map<string, Marker> {
     return this.vehicleMarkers;
+  }
+
+  trackVehicle(vehicle: IVehicleModel): void {
+    const marker = this.vehicleMarkers.get(vehicle.vehicle.id);
+    if (marker) {
+      this.goToLocation([marker.getLatLng().lat, marker.getLatLng().lng]);
+      this.followMarkerInterval = setInterval(() => {
+        this.goToLocation([marker.getLatLng().lat, marker.getLatLng().lng]);
+      }, 1000);
+    }
+  }
+
+  goToVehicleLocation(vehicleId: string): void {
+    const marker = this.vehicleMarkers.get(vehicleId);
+    if (marker) {
+      this.goToLocation([marker.getLatLng().lat, marker.getLatLng().lng]);
+    }
+  }
+
+  goToStopLocation(stopId: string): void {
+    const marker = this.stopMarkers.get(stopId);
+    if (marker) {
+      this.goToLocation([marker.getLatLng().lat, marker.getLatLng().lng]);
+    }
+  }
+
+  stopTrackingVehicle(): void {
+    if (this.followMarkerInterval) {
+      clearInterval(this.followMarkerInterval);
+    }
+  }
+
+  removeActiveVehicle(): void {
+    const vehicleId = this.appStore?.activeVehicle?.vehicle.id;
+    if (vehicleId) {
+      const marker = this.vehicleMarkers.get(vehicleId);
+      if (marker) {
+        marker.getElement()?.classList.remove("active");
+      }
+    }
   }
 }

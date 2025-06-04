@@ -7,12 +7,11 @@ const client = axios.create({
   baseURL: BACKEND_URL
 });
 
-const { alert } = useNotifications();
-const appStore = useAppStore();
-
 client.interceptors.response.use(
   (response) => response,
   (error) => {
+    const { alert } = useNotifications();
+    const appStore = useAppStore();
     alert({
       type: "error",
       text: "Dogodila se greška!"

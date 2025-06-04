@@ -1,3 +1,4 @@
+import { routeColors } from "@/constants/vehicle";
 import { randInt } from "./math";
 
 /**
@@ -32,3 +33,10 @@ export function darkenHexColor(hex: string, percent: number) {
   const toHex = (val: number) => val.toString(16).padStart(2, "0");
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
+
+export const getColorByRouteId = (routeId: string | undefined) => {
+  if (routeId) {
+    return routeColors[routeId] || routeColors.default;
+  }
+  return routeColors.default;
+};
