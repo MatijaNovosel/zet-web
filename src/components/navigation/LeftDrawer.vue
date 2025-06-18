@@ -62,16 +62,6 @@ const drawer = ref(false);
 </script>
 
 <style lang="scss" scoped>
-.left_menu {
-  position: absolute;
-  background-color: white;
-  z-index: 999;
-  top: 25px;
-  left: 25px;
-  width: 300px;
-  border-radius: 8px;
-}
-
 .drawer_btn {
   position: absolute;
   z-index: 9999;

@@ -1,7 +1,10 @@
 <template>
   <v-layout>
     <alerts />
-    <left-drawer v-if="mobile" />
+    <template v-if="mobile">
+      <left-drawer />
+      <right-drawer v-if="appStore.activeStop || appStore.activeVehicle" />
+    </template>
     <template v-else>
       <left-menu />
       <right-menu v-if="appStore.activeStop || appStore.activeVehicle" />
@@ -14,6 +17,7 @@
 
 <script setup lang="ts">
 import LeftDrawer from "@/components/navigation/LeftDrawer.vue";
+import RightDrawer from "@/components/navigation/RightDrawer.vue";
 import { useAppStore } from "@/store/app";
 import { useDisplay } from "vuetify";
 import LeftMenu from "../components/navigation/LeftMenu.vue";
