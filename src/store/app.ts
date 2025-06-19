@@ -1,6 +1,8 @@
+import { IStopsService } from "@/api/interfaces/stops";
 import { POLLING_DURATION } from "@/constants/app";
 import { allBusLines, allTramLines, busLines, tramLines } from "@/constants/vehicle";
-import { IStopModel } from "@/models/stop";
+import { getService, Types } from "@/di-container";
+import { IStopArrivalModel, IStopModel } from "@/models/stop";
 import { IVehicleModel } from "@/models/vehicle";
 import { defineStore } from "pinia";
 import { computed, reactive, ref } from "vue";
@@ -19,11 +21,16 @@ export const useAppStore = defineStore("app", () => {
   // Data
   const loading = ref(false);
   const loadingData = ref(false);
+  const loadingArrivals = ref(false);
   const trackingVehicle = ref(false);
   const rightMenu = ref(false);
   const progress = ref(0);
   const activeStop = ref<IStopModel | null>(null);
   const activeVehicle = ref<IVehicleModel | null>(null);
+
+  const stopArrivals = ref<IStopArrivalModel[]>([]);
+
+  const stopService = getService<IStopsService>(Types.StopsService);
 
   const leftMenuFilters = reactive<ILeftMenuFilters>({
     showBus: true,
@@ -36,9 +43,28 @@ export const useAppStore = defineStore("app", () => {
   });
 
   let progressInterval: NodeJS.Timeout | undefined;
+  let stopArrivalsInterval: NodeJS.Timeout | undefined;
 
-  const setActiveStop = (stop: IStopModel | null) => {
+  const getStopArrivals = async (stop: IStopModel) => {
+    try {
+      loadingArrivals.value = true;
+      stopArrivals.value = await stopService.getArrivals(stop.stopId);
+    } finally {
+      loadingArrivals.value = false;
+    }
+  };
+
+  const setActiveStop = async (stop: IStopModel | null) => {
     if (activeStop.value?.stopId === stop?.stopId) return;
+    if (stopArrivalsInterval) {
+      clearInterval(stopArrivalsInterval);
+    }
+    if (stop) {
+      getStopArrivals(stop);
+      stopArrivalsInterval = setInterval(async () => {
+        getStopArrivals(stop);
+      }, 5_000);
+    }
     activeStop.value = stop;
   };
 
@@ -103,6 +129,8 @@ export const useAppStore = defineStore("app", () => {
     activeStop,
     activeVehicle,
     trackingVehicle,
+    stopArrivals,
+    loadingArrivals,
     setActiveVehicle,
     setActiveStop,
     addToRoutesFilter,

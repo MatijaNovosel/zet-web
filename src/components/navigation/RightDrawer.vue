@@ -1,10 +1,33 @@
 <template>
-  <div
-    v-if="!drawer"
-    class="toolbar"
-  >
+  <div class="toolbar">
     <div class="toolbar_title">
-      {{ menuTitle }}
+      <div
+        v-if="appStore.activeVehicle"
+        class="toolbar_title_vehicle_circle"
+        :style="{
+          backgroundColor: getColorByRouteId(appStore.activeVehicle.trip.routeId)
+        }"
+      >
+        {{ appStore.activeVehicle.trip.routeId }}
+      </div>
+      <div class="toolbar_title_text">
+        {{ menuTitle }}
+      </div>
+      <div
+        v-if="appStore.activeStop"
+        class="toolbar_title_route_list ml-2"
+      >
+        <div
+          v-for="(route, i) in stopRoutes"
+          class="toolbar_title_route_list_item"
+          :key="i"
+          :style="{
+            backgroundColor: getColorByRouteId(route)
+          }"
+        >
+          {{ route }}
+        </div>
+      </div>
     </div>
     <div class="toolbar_separator" />
     <div class="toolbar_actions">
@@ -89,14 +112,17 @@
         </template>
       </v-checkbox>
     </div>
+    <stop-arrivals-list />
   </v-navigation-drawer>
 </template>
 
 <script lang="ts" setup>
 import { IMapService } from "@/api/interfaces/map";
 import { getService, Types } from "@/di-container";
+import { getColorByRouteId } from "@/helpers/misc";
 import { useAppStore } from "@/store/app";
 import { computed, ref, watch } from "vue";
+import StopArrivalsList from "./StopArrivalsList.vue";
 
 const appStore = useAppStore();
 
@@ -111,6 +137,13 @@ const goToLocation = () => {
     mapService.goToStopLocation(appStore.activeStop.stopId);
   }
 };
+
+const stopRoutes = computed(() => {
+  if (appStore.activeStop) {
+    return new Set(appStore.stopArrivals.map((x) => x.routeId));
+  }
+  return [];
+});
 
 const menuTitle = computed(() => {
   if (appStore.activeVehicle) {
@@ -156,7 +189,7 @@ watch(
 .toolbar {
   flex-wrap: nowrap;
   position: absolute;
-  z-index: 9999;
+  z-index: 500;
   bottom: 12px;
   left: 50%;
   display: flex;
@@ -168,14 +201,46 @@ watch(
   box-shadow: #64646f33 0px 7px 29px 0px;
 
   &_title {
-    padding: 10px 20px;
+    padding: 5px 15px;
     display: flex;
     align-items: center;
-    font-size: 12px;
     white-space: nowrap;
-    flex-grow: 1;
-    overflow: hidden;
-    text-overflow: ellipsis;
+
+    &_route_list {
+      display: flex;
+      gap: 4px;
+
+      &_item {
+        border-radius: 50%;
+        width: 14px;
+        height: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 6px;
+        font-weight: bold;
+        color: white;
+      }
+    }
+
+    &_text {
+      font-size: 12px;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    &_vehicle_circle {
+      border-radius: 50%;
+      margin-right: 10px;
+      width: 25px;
+      height: 25px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 12px;
+      font-weight: bold;
+      color: white;
+    }
   }
 
   &_separator {

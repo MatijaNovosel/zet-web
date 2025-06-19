@@ -4,3 +4,15 @@ export interface IStopModel {
   stopLat: number;
   stopLon: number;
 }
+
+export interface IStopArrivalModel {
+  airDistanceInMeters: number;
+  arrivalTimeInMinutes: number;
+  calculatedArrivalTime: string;
+  delayInSeconds: number | null;
+  isRealtimeConfirmed: boolean;
+  realtimeDataTimestamp: string;
+  routeId: string;
+  scheduledArrivalTime: string;
+  tripId: string;
+}

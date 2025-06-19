@@ -343,15 +343,16 @@ export class MapService implements IMapService {
       })
     });
 
-    newMarker.addEventListener("click", () => {
+    newMarker.addEventListener("click", async () => {
       if (!this.appStore!.activeStop) {
         this.activeStopMarker?.addTo(this.map!);
       }
+
       this.activeStopMarker!.setLatLng([stop.stopLat, stop.stopLon]);
       this.appStore!.setActiveStop(stop);
-
       this.appStore!.setActiveVehicle(null);
       this.removeActiveVehicle();
+
       if (this.appStore!.trackingVehicle) {
         this.stopTrackingVehicle();
       }
