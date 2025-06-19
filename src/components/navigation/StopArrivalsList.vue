@@ -62,7 +62,6 @@ const appStore = useAppStore();
     &_item {
       border-top: 1px solid #8080801c;
       display: flex;
-      justify-content: space-between;
       align-items: center;
       padding-left: 15px;
       padding-right: 10px;
@@ -71,10 +70,6 @@ const appStore = useAppStore();
 
       &:first-child {
         border-top: none;
-      }
-
-      &:nth-child(even) {
-        background-color: rgba(128, 128, 128, 0.062);
       }
 
       &_route {
@@ -91,7 +86,7 @@ const appStore = useAppStore();
       }
 
       &_times {
-        width: 100px;
+        flex-grow: 1;
         display: flex;
         align-items: start;
         flex-direction: column;
@@ -101,7 +96,7 @@ const appStore = useAppStore();
         }
 
         &_scheduled {
-          font-size: 12px;
+          font-size: 10px;
           color: #c2a3a3;
         }
       }
