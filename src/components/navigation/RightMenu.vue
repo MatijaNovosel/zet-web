@@ -180,7 +180,7 @@ watch(
         }
 
         &:nth-child(even) {
-          background-color: rgba(128, 128, 128, 0.062);
+          background-color: #80808010;
         }
 
         &_route {
