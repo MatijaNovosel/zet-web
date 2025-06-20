@@ -145,6 +145,7 @@ watch(
   width: 350px;
   border-radius: 8px;
   max-height: calc(100% - 50px);
+  overflow: auto;
 
   &_stop {
     &_arrival_header {

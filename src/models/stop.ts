@@ -10,6 +10,7 @@ export interface IStopArrivalModel {
   arrivalTimeInMinutes: number;
   calculatedArrivalTime: string;
   delayInSeconds: number | null;
+  vehicleId: number | null;
   isRealtimeConfirmed: boolean;
   realtimeDataTimestamp: string;
   routeId: string;

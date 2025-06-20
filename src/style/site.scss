@@ -190,6 +190,10 @@ body {
   }
 }
 
+.pulse {
+  animation: pulse 1.5s ease-out infinite;
+}
+
 @keyframes pulse {
   0% {
     transform: scale(1);
