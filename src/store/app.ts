@@ -4,8 +4,10 @@ import { allBusLines, allTramLines, busLines, tramLines } from "@/constants/vehi
 import { getService, Types } from "@/di-container";
 import { IStopArrivalModel, IStopModel } from "@/models/stop";
 import { IVehicleModel } from "@/models/vehicle";
+import ROUTE_NAMES from "@/router/routeNames";
 import { defineStore } from "pinia";
 import { computed, reactive, ref } from "vue";
+import { useRouter } from "vue-router";
 
 interface ILeftMenuFilters {
   showBus: boolean;
@@ -31,6 +33,7 @@ export const useAppStore = defineStore("app", () => {
   const stopArrivals = ref<IStopArrivalModel[]>([]);
 
   const stopService = getService<IStopsService>(Types.StopsService);
+  const router = useRouter();
 
   const leftMenuFilters = reactive<ILeftMenuFilters>({
     showBus: true,
@@ -74,6 +77,13 @@ export const useAppStore = defineStore("app", () => {
     if (!vehicle) {
       leftMenuFilters.activeRoutes.delete(activeVehicle.value?.trip.routeId!);
     }
+
+    router.replace({
+      name: ROUTE_NAMES.HOME,
+      params: {
+        id: vehicle === null ? "home" : vehicle?.vehicle.id
+      }
+    });
 
     activeVehicle.value = vehicle;
   };

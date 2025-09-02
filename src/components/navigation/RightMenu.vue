@@ -41,38 +41,50 @@
       />
     </div>
     <v-divider />
-    <div
-      v-if="appStore.activeVehicle"
-      class="d-flex align-center justify-space-between pl-4 py-2"
-    >
-      <v-checkbox
-        hide-details
-        density="compact"
-        color="blue"
-        v-model="appStore.trackingVehicle"
-      >
-        <template #label>
-          <div class="track_vehicle_label">Prati vozilo</div>
-        </template>
-      </v-checkbox>
-      <v-btn
-        class="mr-5"
-        icon
-        flat
-        variant="text"
-        size="30px"
-        color="blue"
-        @click="goToLocation"
-      >
-        <v-icon> mdi-crosshairs-gps </v-icon>
-      </v-btn>
-    </div>
+    <template v-if="appStore.activeVehicle">
+      <div class="d-flex align-center justify-space-between pl-4 py-2">
+        <v-checkbox
+          hide-details
+          density="compact"
+          color="blue"
+          v-model="appStore.trackingVehicle"
+        >
+          <template #label>
+            <div class="track_vehicle_label">Prati vozilo</div>
+          </template>
+        </v-checkbox>
+        <v-btn
+          class="mr-5"
+          icon
+          flat
+          variant="text"
+          size="30px"
+          color="blue"
+          @click="goToLocation"
+        >
+          <v-icon> mdi-crosshairs-gps </v-icon>
+        </v-btn>
+      </div>
+      <v-divider />
+      <div class="d-flex align-center justify-end py-3 pr-5">
+        <v-btn
+          variant="text"
+          rounded="0"
+          color="blue-darken-1"
+          class="text-none"
+          @click="shareVehicle"
+        >
+          Podijeli
+        </v-btn>
+      </div>
+    </template>
     <stop-arrivals-list />
   </div>
 </template>
 
 <script lang="ts" setup>
 import { IMapService } from "@/api/interfaces/map";
+import { useNotifications } from "@/composables/useNotifications";
 import { getService, Types } from "@/di-container";
 import { getColorByRouteId } from "@/helpers/misc";
 import { useAppStore } from "@/store/app";
@@ -81,6 +93,7 @@ import StopArrivalsList from "./StopArrivalsList.vue";
 
 const appStore = useAppStore();
 const mapService = getService<IMapService>(Types.MapService);
+const notify = useNotifications();
 
 const menuTitle = computed(() => {
   if (appStore.activeVehicle) {
@@ -116,6 +129,15 @@ const goToLocation = () => {
   } else if (appStore.activeStop) {
     mapService.goToStopLocation(appStore.activeStop.stopId);
   }
+};
+
+const shareVehicle = () => {
+  const res = window.location.toString();
+  navigator.clipboard.writeText(res);
+  notify.alert({
+    text: "Vehicle copied to clipboard",
+    type: "success"
+  });
 };
 
 watch(

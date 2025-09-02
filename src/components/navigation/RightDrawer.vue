@@ -51,6 +51,15 @@
         v-if="appStore.activeVehicle"
         class="ml-2"
         size="22"
+        color="grey"
+        @click="shareVehicle"
+      >
+        mdi-share
+      </v-icon>
+      <v-icon
+        v-if="appStore.activeVehicle"
+        class="ml-2"
+        size="22"
         :color="appStore.trackingVehicle ? 'red' : 'grey'"
         @click="appStore.trackingVehicle = !appStore.trackingVehicle"
       >
@@ -118,6 +127,7 @@
 
 <script lang="ts" setup>
 import { IMapService } from "@/api/interfaces/map";
+import { useNotifications } from "@/composables/useNotifications";
 import { getService, Types } from "@/di-container";
 import { getColorByRouteId } from "@/helpers/misc";
 import { useAppStore } from "@/store/app";
@@ -127,6 +137,8 @@ import StopArrivalsList from "./StopArrivalsList.vue";
 const appStore = useAppStore();
 
 const drawer = ref(false);
+
+const notify = useNotifications();
 
 const mapService = getService<IMapService>(Types.MapService);
 
@@ -160,6 +172,15 @@ const menuSubtitle = computed(() => {
     return appStore.activeStop.stopId;
   }
 });
+
+const shareVehicle = () => {
+  const res = window.location.toString();
+  navigator.clipboard.writeText(res);
+  notify.alert({
+    text: "Vehicle copied to clipboard",
+    type: "success"
+  });
+};
 
 const closeMenu = () => {
   if (appStore.activeVehicle) {

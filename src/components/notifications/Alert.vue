@@ -1,7 +1,7 @@
 <template>
   <v-alert
     :class="props.alert.closable ? 'pl-8' : ''"
-    class="py-1 px-6 unselectable"
+    class="py-1 px-6 unselectable elevation-5"
     density="compact"
     rounded="lg"
     :color="props.alert.type"
