@@ -36,7 +36,7 @@ export interface IMapService {
   removeActiveStopMarker(): void;
   getVehicleMarkers(): Map<string, Marker>;
 
-  trackVehicle(vehicle: IVehicleModel): void;
+  trackVehicle(vehicle: IVehicleModel | string): void;
   removeActiveVehicle(): void;
   stopTrackingVehicle(): void;
   goToStopLocation(stopId: string): void;

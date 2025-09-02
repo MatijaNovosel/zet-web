@@ -23,6 +23,7 @@ import { IStopModel } from "@/models/stop";
 import { IVehicleModel } from "@/models/vehicle";
 import { useAppStore } from "@/store/app";
 import { onMounted, onUnmounted, reactive, watch } from "vue";
+import { useRouter } from "vue-router";
 
 interface IState {
   vehicles: IVehicleModel[];
@@ -31,6 +32,7 @@ interface IState {
 }
 
 const appStore = useAppStore();
+const router = useRouter();
 
 const gtfsService = getService<IGTFSService>(Types.GtfsService);
 const routeService = getService<IRouteService>(Types.RouteService);
@@ -205,6 +207,10 @@ onMounted(async () => {
   await pollData();
   pollCurrentLocation();
   mapService.updateVisibleMarkers();
+  const routeId = router.currentRoute.value.params.id;
+  if (routeId && routeId !== "home") {
+    mapService.trackVehicle(routeId as string);
+  }
   appStore.loading = false;
 });
 

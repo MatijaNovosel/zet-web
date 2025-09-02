@@ -309,6 +309,9 @@ export class MapService implements IMapService {
       })
     });
 
+    // @ts-ignore
+    newMarker.data = vehicle;
+
     newMarker.addEventListener("click", () => {
       this.appStore?.leftMenuFilters.activeRoutes.clear();
 
@@ -398,12 +401,26 @@ export class MapService implements IMapService {
     return this.vehicleMarkers;
   }
 
-  trackVehicle(vehicle: IVehicleModel): void {
-    const marker = this.vehicleMarkers.get(vehicle.vehicle.id);
+  trackVehicle(vehicle: IVehicleModel | string): void {
+    let marker: Marker | undefined = undefined;
+
+    if (typeof vehicle === "string") {
+      marker = this.vehicleMarkers.get(vehicle);
+      // @ts-ignore
+      const data = marker.data as IVehicleModel;
+      this.appStore?.setActiveVehicle(data);
+      this.appStore!.trackingVehicle = true;
+      if (!this.appStore?.leftMenuFilters.activeRoutes.has(data.trip.routeId)) {
+        this.appStore!.addToRoutesFilter(data.trip.routeId);
+      }
+    } else {
+      marker = this.vehicleMarkers.get(vehicle.vehicle.id);
+    }
+
     if (marker) {
       this.goToLocation([marker.getLatLng().lat, marker.getLatLng().lng]);
       this.followMarkerInterval = setInterval(() => {
-        this.goToLocation([marker.getLatLng().lat, marker.getLatLng().lng]);
+        this.goToLocation([marker!.getLatLng().lat, marker!.getLatLng().lng]);
       }, 1000);
     }
   }

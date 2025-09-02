@@ -9,6 +9,10 @@ const routes: RouteRecordRaw[] = [
     children: [
       {
         path: "",
+        redirect: { name: ROUTE_NAMES.HOME, params: { id: "home" } }
+      },
+      {
+        path: ":id",
         name: ROUTE_NAMES.HOME,
         component: () => import("../views/Home.vue"),
         meta: {
