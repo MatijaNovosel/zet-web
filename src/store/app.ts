@@ -45,8 +45,8 @@ export const useAppStore = defineStore("app", () => {
     activeRoutes: new Set()
   });
 
-  let progressInterval: NodeJS.Timeout | undefined;
-  let stopArrivalsInterval: NodeJS.Timeout | undefined;
+  let progressInterval: number | undefined;
+  let stopArrivalsInterval: number | undefined;
 
   const getStopArrivals = async (stop: IStopModel) => {
     try {

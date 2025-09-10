@@ -45,8 +45,8 @@ const state = reactive<IState>({
   stops: []
 });
 
-let vehiclePollInterval: NodeJS.Timeout | null = null;
-let currentLocationPollInterval: NodeJS.Timeout | null = null;
+let vehiclePollInterval: number | null = null;
+let currentLocationPollInterval: number | null = null;
 
 const getData = async () => {
   try {

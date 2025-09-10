@@ -1,0 +1,7 @@
+{
+  "name": "KnorkZET",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
