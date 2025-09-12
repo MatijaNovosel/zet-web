@@ -6,6 +6,9 @@ a[href="https://www.maptiler.com"]
 body {
   margin: 0;
   padding: 0;
+  background-color: black;
+  padding-top: var(--safe-area-inset-top);
+  padding-bottom: var(--safe-area-inset-bottom);
 }
 
 #map {

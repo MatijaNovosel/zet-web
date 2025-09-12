@@ -90,7 +90,7 @@ export class MapService {
         this.map = map("map", {
             zoomControl: false,
             center: latLng(DEFAULT_LOCATION[0], DEFAULT_LOCATION[1]),
-            zoom: 14
+            zoom: 15
         });
         this.tileLayer = tileLayer(`https://api.maptiler.com/maps/basic-v2/{z}/{x}/{y}@2x.png?key=${MAPTILER_KEY}`, {
             crossOrigin: true,

@@ -2,6 +2,8 @@
 import { allBusLines, allTramLines, routeColors } from "@/constants/vehicle";
 import { getService, Types } from "@/di-container";
 import { useAppStore } from "@/store/app";
+import { Capacitor } from "@capacitor/core";
+import { Geolocation } from "@capacitor/geolocation";
 import { computed } from "vue";
 import { useDisplay } from "vuetify";
 import FilterChip from "./FilterChip.vue";
@@ -51,12 +53,18 @@ const toggleTrams = () => {
         });
     }
 };
-const goToCurrentLocation = () => {
-    navigator.geolocation.getCurrentPosition((position) => {
-        mapService.goToLocation([position.coords.latitude, position.coords.longitude]);
-    }, () => {
-        //
-    });
+const goToCurrentLocation = async () => {
+    if (Capacitor.isNativePlatform()) {
+        const pos = await Geolocation.getCurrentPosition();
+        mapService.updateCurrentLocation([pos.coords.latitude, pos.coords.longitude]);
+    }
+    else {
+        navigator.geolocation.getCurrentPosition((position) => {
+            mapService.goToLocation([position.coords.latitude, position.coords.longitude]);
+        }, () => {
+            //
+        });
+    }
 };
 debugger; /* PartiallyEnd: #3632/scriptSetup.vue */
 const __VLS_ctx = {};

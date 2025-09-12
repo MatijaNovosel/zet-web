@@ -1,7 +1,17 @@
 /// <reference types="../node_modules/.vue-global-types/vue_3.5_0_0_0.d.ts" />
+import { SafeArea } from "@capacitor-community/safe-area";
 import ConfirmationDialogProvider from "./components/confirmationDialog/ConfirmationDialogProvider.vue";
 import { useAppStore } from "./store/app";
 const appStore = useAppStore();
+SafeArea.enable({
+    config: {
+        customColorsForSystemBars: true,
+        statusBarColor: "#00000000",
+        statusBarContent: "light",
+        navigationBarColor: "#00000000",
+        navigationBarContent: "light"
+    }
+});
 debugger; /* PartiallyEnd: #3632/scriptSetup.vue */
 const __VLS_ctx = {};
 let __VLS_components;

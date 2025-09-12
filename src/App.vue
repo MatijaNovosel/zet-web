@@ -28,8 +28,19 @@
 </template>
 
 <script setup lang="ts">
+import { SafeArea } from "@capacitor-community/safe-area";
 import ConfirmationDialogProvider from "./components/confirmationDialog/ConfirmationDialogProvider.vue";
 import { useAppStore } from "./store/app";
 
 const appStore = useAppStore();
+
+SafeArea.enable({
+  config: {
+    customColorsForSystemBars: true,
+    statusBarColor: "#00000000",
+    statusBarContent: "light",
+    navigationBarColor: "#00000000",
+    navigationBarContent: "light"
+  }
+});
 </script>

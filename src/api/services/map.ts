@@ -119,7 +119,7 @@ export class MapService implements IMapService {
     this.map = map("map", {
       zoomControl: false,
       center: latLng(DEFAULT_LOCATION[0], DEFAULT_LOCATION[1]),
-      zoom: 14
+      zoom: 15
     });
 
     this.tileLayer = tileLayer(

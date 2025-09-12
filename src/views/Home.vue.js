@@ -4,6 +4,8 @@ import { allBusLines, allTramLines, busLines, nightBusLines, nightTramLines, tra
 import { getService, Types } from "@/di-container";
 import { getLineType } from "@/helpers/gtfs";
 import { useAppStore } from "@/store/app";
+import { Capacitor } from "@capacitor/core";
+import { Geolocation } from "@capacitor/geolocation";
 import { onMounted, onUnmounted, reactive, watch } from "vue";
 import { useRouter } from "vue-router";
 const appStore = useAppStore();
@@ -80,12 +82,18 @@ const getStops = async () => {
     }
 };
 const pollCurrentLocation = () => {
-    currentLocationPollInterval = setInterval(() => {
-        navigator.geolocation.getCurrentPosition(({ coords }) => {
-            mapService.updateCurrentLocation([coords.latitude, coords.longitude]);
-        }, () => {
-            //
-        });
+    currentLocationPollInterval = setInterval(async () => {
+        if (Capacitor.isNativePlatform()) {
+            const pos = await Geolocation.getCurrentPosition();
+            mapService.updateCurrentLocation([pos.coords.latitude, pos.coords.longitude]);
+        }
+        else {
+            navigator.geolocation.getCurrentPosition(({ coords }) => {
+                mapService.updateCurrentLocation([coords.latitude, coords.longitude]);
+            }, () => {
+                //
+            });
+        }
     }, 5000);
 };
 watch(() => appStore.activeStop, (val) => {

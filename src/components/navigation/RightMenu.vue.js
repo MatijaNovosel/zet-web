@@ -1,5 +1,6 @@
 /// <reference types="../../../node_modules/.vue-global-types/vue_3.5_0_0_0.d.ts" />
 import { useNotifications } from "@/composables/useNotifications";
+import { WEB_URL } from "@/constants/app";
 import { getService, Types } from "@/di-container";
 import { getColorByRouteId } from "@/helpers/misc";
 import { useAppStore } from "@/store/app";
@@ -43,8 +44,7 @@ const goToLocation = () => {
     }
 };
 const shareVehicle = () => {
-    const res = window.location.toString();
-    navigator.clipboard.writeText(res);
+    navigator.clipboard.writeText(`${WEB_URL}/${appStore.activeVehicle?.vehicle.id}`);
     notify.alert({
         text: "Vehicle copied to clipboard",
         type: "success"
