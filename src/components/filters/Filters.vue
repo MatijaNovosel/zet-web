@@ -180,7 +180,7 @@ const toggleTrams = () => {
 const goToCurrentLocation = async () => {
   if (Capacitor.isNativePlatform()) {
     const pos = await Geolocation.getCurrentPosition();
-    mapService.updateCurrentLocation([pos.coords.latitude, pos.coords.longitude]);
+    mapService.goToLocation([pos.coords.latitude, pos.coords.longitude]);
   } else {
     navigator.geolocation.getCurrentPosition(
       (position) => {
