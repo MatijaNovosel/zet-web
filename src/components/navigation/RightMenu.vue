@@ -133,7 +133,7 @@ const goToLocation = () => {
 };
 
 const shareVehicle = () => {
-  navigator.clipboard.writeText(`${WEB_URL}/${appStore.activeVehicle?.vehicle.id}`);
+  navigator.clipboard.writeText(`${WEB_URL}${appStore.activeVehicle?.vehicle.id}`);
   notify.alert({
     text: "Vehicle copied to clipboard",
     type: "success"
