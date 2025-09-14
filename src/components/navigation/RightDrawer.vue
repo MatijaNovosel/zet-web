@@ -211,7 +211,7 @@ watch(
   flex-wrap: nowrap;
   position: absolute;
   z-index: 500;
-  bottom: 12px;
+  bottom: calc(24px + var(--safe-area-inset-bottom));
   left: 50%;
   display: flex;
   transform: translate(-50%, -50%);
