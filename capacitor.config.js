@@ -1,5 +1,5 @@
 const config = {
-    appId: "io.ionic.starter",
+    appId: "com.matija.knorkzet",
     appName: "KnorkZET",
     webDir: "dist",
     server: {
