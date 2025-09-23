@@ -9,7 +9,7 @@
     "paths": {
       "@/*": ["src/*"]
     },
-    "types": ["vuetify"],
+    "types": ["vuetify", "node"],
     "resolveJsonModule": true,
     "strict": true,
     "strictNullChecks": true,

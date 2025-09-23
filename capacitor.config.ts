@@ -4,9 +4,12 @@ const config: CapacitorConfig = {
   appId: "com.matija.knorkzet",
   appName: "KnorkZET",
   webDir: "dist",
-  server: {
-    cleartext: true
-  }
+  server:
+    process.env.ENV === "development"
+      ? {
+          cleartext: true
+        }
+      : {}
 };
 
 export default config;
