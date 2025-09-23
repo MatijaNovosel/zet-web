@@ -43,7 +43,7 @@ export class MapService implements IMapService {
 
   tileLayer: TileLayer | null = null;
 
-  followMarkerInterval: number | null = null;
+  followMarkerInterval: NodeJS.Timeout | null = null;
 
   changeMapType(type: number): void {
     let style = "";
