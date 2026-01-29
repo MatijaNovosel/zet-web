@@ -1,4 +1,4 @@
-import { DEFAULT_LOCATION, MAPTILER_KEY, MapTypeEnum, POLLING_DURATION } from "@/constants/app";
+import { DEFAULT_LOCATION, MapTypeEnum, POLLING_DURATION } from "@/constants/app";
 import { routeColors } from "@/constants/vehicle";
 import { computeHeading } from "@/helpers/map";
 import { darkenHexColor, getColorByRouteId } from "@/helpers/misc";
@@ -47,15 +47,24 @@ export class MapService implements IMapService {
 
   changeMapType(type: number): void {
     let style = "";
+    let attribution = "";
+
     switch (type) {
       case MapTypeEnum.Satellite:
-        style = `https://api.maptiler.com/maps/satellite/{z}/{x}/{y}@2x.jpg?key=${MAPTILER_KEY}`;
+        style =
+          "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}";
+        attribution = "Tiles © Esri — Source: Esri, Maxar, Earthstar Geographics";
         break;
+
       case MapTypeEnum.Street:
-        style = `https://api.maptiler.com/maps/basic-v2/{z}/{x}/{y}@2x.png?key=${MAPTILER_KEY}`;
+      default:
+        style = "https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png";
+        attribution = "© OpenStreetMap contributors";
         break;
     }
+
     this.tileLayer?.setUrl(style);
+    this.tileLayer!.options.attribution = attribution;
   }
 
   updateCurrentLocation(coords: [number, number]): void {
@@ -122,15 +131,10 @@ export class MapService implements IMapService {
       zoom: 15
     });
 
-    this.tileLayer = tileLayer(
-      `https://api.maptiler.com/maps/basic-v2/{z}/{x}/{y}@2x.png?key=${MAPTILER_KEY}`,
-      {
-        crossOrigin: true,
-        tileSize: 512,
-        zoomOffset: -1,
-        minZoom: 1
-      }
-    );
+    this.tileLayer = tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      attribution: "© OpenStreetMap contributors",
+      maxZoom: 19
+    });
 
     this.tileLayer!.addTo(this.map!);
 
