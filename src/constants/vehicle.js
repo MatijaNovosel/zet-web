@@ -172,5 +172,5 @@ export const routeColors = {
     313: "#ff0018",
     315: "#ff6f00",
     330: "#00acc1",
-    0: "grey"
+    0: "#9e9e9e"
 };
