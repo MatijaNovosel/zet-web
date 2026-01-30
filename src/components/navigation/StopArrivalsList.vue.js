@@ -52,7 +52,7 @@ if (__VLS_ctx.appStore.activeStop) {
                             return;
                         if (!(__VLS_ctx.appStore.stopArrivals.length))
                             return;
-                        __VLS_ctx.goToVehicle(arrival.vehicleId);
+                        __VLS_ctx.goToVehicle(Number(arrival.vehicleId));
                     } },
                 ...{ class: "stop_arrivals_item_route" },
                 ...{ style: ({

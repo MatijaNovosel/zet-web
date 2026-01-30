@@ -52,6 +52,24 @@ export class MapService {
         }
         this.currentLocationMarker.setLatLng(coords);
     }
+    buildVehicleIcon(vehicle, isActive) {
+        const color = getColorByRouteId(vehicle.route_id);
+        const arrowColor = darkenHexColor(color, 15);
+        return divIcon({
+            html: `
+      <div class="vehicle-marker ${isActive ? "active" : ""}">
+        <div class="vehicle-marker-text" style="background-color: ${color};">
+          ${vehicle.route_id}
+        </div>
+        <div class="vehicle-marker-rotation" style="transform: rotate(${vehicle.rotation_deg}deg)">
+          <div class="vehicle-marker-rotation-arrow" style="border-bottom: 12px solid ${arrowColor};"></div>
+        </div>
+      </div>
+    `,
+            className: "",
+            iconSize: [35, 35]
+        });
+    }
     updateVisibleMarkers() {
         if (!this.map)
             return;
@@ -155,24 +173,8 @@ export class MapService {
         requestAnimationFrame(animate);
     }
     rotateVehicleMarker(marker, vehicle) {
-        const color = getColorByRouteId(vehicle.route_id);
-        const arrowColor = darkenHexColor(color, 15);
         const isActive = this.appStore?.activeVehicle?.id === vehicle.id;
-        const newIcon = divIcon({
-            html: `
-          <div class="vehicle-marker ${isActive ? "active" : ""}">
-            <div class="vehicle-marker-text" style="background-color: ${color};">
-              ${vehicle.route_id}
-            </div>
-            <div class="vehicle-marker-rotation" style="transform: rotate(${vehicle.rotation_deg}deg)">
-              <div class="vehicle-marker-rotation-arrow" style="border-bottom: 12px solid ${arrowColor};"></div>
-            </div>
-          </div>
-        `,
-            className: "",
-            iconSize: [35, 35]
-        });
-        marker.setIcon(newIcon);
+        marker.setIcon(this.buildVehicleIcon(vehicle, isActive));
     }
     removeLayer(layer) {
         this.map.removeLayer(layer);
@@ -206,40 +208,37 @@ export class MapService {
             this.map.addLayer(layer);
         }
     }
+    getMap() {
+        if (!this.map)
+            throw new Error("Map not initialized");
+        return this.map;
+    }
     addRouteLayer(id) {
-        const layer = layerGroup();
-        layer.addTo(this.map);
+        if (this.routeLayers.has(id))
+            return;
+        const layer = layerGroup().addTo(this.getMap());
         this.routeLayers.set(id, layer);
     }
+    onVehicleClick(vehicle, marker) {
+        if (!this.appStore)
+            return;
+        this.appStore.leftMenuFilters.activeRoutes.clear();
+        if (!this.appStore.leftMenuFilters.activeRoutes.has(vehicle.route_id)) {
+            this.appStore.addToRoutesFilter(vehicle.route_id);
+        }
+        this.appStore.setActiveVehicle(vehicle);
+        this.appStore.setActiveStop(null);
+        this.appStore.trackingVehicle = false;
+        const { lat, lng } = marker.getLatLng();
+        this.goToLocation([lat, lng]);
+    }
     addVehicleMarker(vehicle) {
-        const color = getColorByRouteId(vehicle.route_id);
+        const isActive = this.appStore?.activeVehicle?.id === vehicle.id;
         const newMarker = marker([vehicle.position_lat, vehicle.position_long], {
-            icon: divIcon({
-                html: `
-          <div class="vehicle-marker" style="background-color: ${color};">
-            <div class="vehicle-marker-text">
-              ${vehicle.route_id}
-            </div>
-            <div class="vehicle-marker-rotation">
-          </div>
-          </div>
-        `,
-                className: "",
-                iconSize: [35, 35]
-            })
+            icon: this.buildVehicleIcon(vehicle, isActive)
         });
-        // @ts-ignore
         newMarker.data = vehicle;
-        newMarker.addEventListener("click", () => {
-            this.appStore?.leftMenuFilters.activeRoutes.clear();
-            if (!this.appStore?.leftMenuFilters.activeRoutes.has(vehicle.route_id)) {
-                this.appStore.addToRoutesFilter(vehicle.route_id);
-            }
-            this.appStore?.setActiveVehicle(vehicle);
-            this.appStore.setActiveStop(null);
-            this.appStore.trackingVehicle = false;
-            this.goToLocation([newMarker.getLatLng().lat, newMarker.getLatLng().lng]);
-        });
+        newMarker.on("click", () => this.onVehicleClick(vehicle, newMarker));
         this.vehicleMarkers.set(vehicle.id, newMarker);
         this.vehicleRouteMap.set(vehicle.id, vehicle.route_id);
         const layer = this.getVehicleLayer(vehicle.route_id);
@@ -301,26 +300,30 @@ export class MapService {
         return this.vehicleMarkers;
     }
     trackVehicle(vehicle) {
-        let marker = undefined;
+        this.stopTrackingVehicle();
+        let marker;
         if (typeof vehicle === "number") {
             marker = this.vehicleMarkers.get(vehicle);
-            // @ts-ignore
-            const data = marker.data;
-            this.appStore?.setActiveVehicle(data);
+            const data = marker?.data;
+            if (!data || !this.appStore)
+                return;
+            this.appStore.setActiveVehicle(data);
             this.appStore.trackingVehicle = true;
-            if (!this.appStore?.leftMenuFilters.activeRoutes.has(data.route_id)) {
+            if (!this.appStore.leftMenuFilters.activeRoutes.has(data.route_id)) {
                 this.appStore.addToRoutesFilter(data.route_id);
             }
         }
         else {
             marker = this.vehicleMarkers.get(vehicle.id);
         }
-        if (marker) {
-            this.goToLocation([marker.getLatLng().lat, marker.getLatLng().lng]);
-            this.followMarkerInterval = setInterval(() => {
-                this.goToLocation([marker.getLatLng().lat, marker.getLatLng().lng]);
-            }, 1000);
-        }
+        if (!marker)
+            return;
+        const update = () => {
+            const { lat, lng } = marker.getLatLng();
+            this.goToLocation([lat, lng]);
+        };
+        update();
+        this.followMarkerInterval = setInterval(update, 1000);
     }
     goToVehicleLocation(vehicleId) {
         const marker = this.vehicleMarkers.get(vehicleId);

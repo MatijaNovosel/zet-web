@@ -18,7 +18,7 @@
             backgroundColor: getColorByRouteId(Number(arrival.routeId)),
             cursor: arrival.vehicleId ? 'pointer' : ''
           }"
-          @click="goToVehicle(arrival.vehicleId)"
+          @click="goToVehicle(Number(arrival.vehicleId))"
         >
           {{ arrival.routeId }}
           <template v-if="arrival.vehicleId">
