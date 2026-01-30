@@ -53,15 +53,15 @@ export const useAppStore = defineStore("app", () => {
         activeStop.value = stop;
     };
     const setActiveVehicle = (vehicle) => {
-        if (activeVehicle.value?.vehicle.id === vehicle?.vehicle.id)
+        if (activeVehicle.value?.id === vehicle?.id)
             return;
         if (!vehicle) {
-            leftMenuFilters.activeRoutes.delete(activeVehicle.value?.trip.routeId);
+            leftMenuFilters.activeRoutes.delete(activeVehicle.value?.route_id);
         }
         router.replace({
             name: ROUTE_NAMES.HOME,
             params: {
-                id: vehicle === null ? "home" : vehicle?.vehicle.id
+                id: vehicle === null ? "home" : vehicle?.id
             }
         });
         activeVehicle.value = vehicle;

@@ -1,5 +1,5 @@
-import { GTFSModel } from "@/models/gtfs";
+import { IGTFSVehicleModel } from "@/models/gtfs";
 
 export interface IGTFSService {
-  getData(): Promise<GTFSModel>;
+  getData(): Promise<IGTFSVehicleModel[]>;
 }

@@ -5,10 +5,10 @@
         v-if="appStore.activeVehicle"
         class="toolbar_title_vehicle_circle"
         :style="{
-          backgroundColor: getColorByRouteId(appStore.activeVehicle.trip.routeId)
+          backgroundColor: getColorByRouteId(appStore.activeVehicle.route_id)
         }"
       >
-        {{ appStore.activeVehicle.trip.routeId }}
+        {{ appStore.activeVehicle.route_id }}
       </div>
       <div class="toolbar_title_text">
         {{ menuTitle }}
@@ -22,7 +22,7 @@
           class="toolbar_title_route_list_item"
           :key="i"
           :style="{
-            backgroundColor: getColorByRouteId(route)
+            backgroundColor: getColorByRouteId(Number(route))
           }"
         >
           {{ route }}
@@ -145,7 +145,7 @@ const mapService = getService<IMapService>(Types.MapService);
 
 const goToLocation = () => {
   if (appStore.activeVehicle) {
-    mapService.goToVehicleLocation(appStore.activeVehicle.vehicle.id);
+    mapService.goToVehicleLocation(appStore.activeVehicle.id);
   } else if (appStore.activeStop) {
     mapService.goToStopLocation(appStore.activeStop.stopId);
   }
@@ -160,7 +160,7 @@ const stopRoutes = computed(() => {
 
 const menuTitle = computed(() => {
   if (appStore.activeVehicle) {
-    return `Vozilo ${appStore.activeVehicle.vehicle.id}`;
+    return `Vozilo ${appStore.activeVehicle.id}`;
   } else if (appStore.activeStop) {
     return appStore.activeStop.stopName;
   }
@@ -168,14 +168,14 @@ const menuTitle = computed(() => {
 
 const menuSubtitle = computed(() => {
   if (appStore.activeVehicle) {
-    return `Ruta ${appStore.activeVehicle.trip.routeId}`;
+    return `Ruta ${appStore.activeVehicle.route_id}`;
   } else if (appStore.activeStop) {
     return appStore.activeStop.stopId;
   }
 });
 
 const shareVehicle = () => {
-  navigator.clipboard.writeText(`${WEB_URL}${appStore.activeVehicle?.vehicle.id}`);
+  navigator.clipboard.writeText(`${WEB_URL}${appStore.activeVehicle?.id}`);
   notify.alert({
     text: "Vehicle copied to clipboard",
     type: "success"

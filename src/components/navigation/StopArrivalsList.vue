@@ -15,7 +15,7 @@
         <div
           class="stop_arrivals_item_route"
           :style="{
-            backgroundColor: getColorByRouteId(arrival.routeId),
+            backgroundColor: getColorByRouteId(Number(arrival.routeId)),
             cursor: arrival.vehicleId ? 'pointer' : ''
           }"
           @click="goToVehicle(arrival.vehicleId)"
@@ -77,7 +77,7 @@ const formatArrivalTime = (val: number) => {
 
 const goToVehicle = (vehicleId: number | null) => {
   if (vehicleId) {
-    mapService.goToVehicleLocation(vehicleId.toString());
+    mapService.goToVehicleLocation(vehicleId);
   }
 };
 </script>

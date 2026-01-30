@@ -1,14 +1,8 @@
-import { IGTFSRouteTripModel } from "./gtfs";
-
 export interface IVehicleModel {
-  trip: IGTFSRouteTripModel;
+  id: number;
+  position_lat: number;
+  position_long: number;
+  rotation_deg: number;
+  route_id: number;
   type: string;
-  position: {
-    latitude: number;
-    longitude: number;
-  };
-  timestamp: string;
-  vehicle: {
-    id: string;
-  };
 }

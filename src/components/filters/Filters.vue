@@ -87,7 +87,7 @@
           <filter-chip
             v-for="tram in appStore.tramsToDisplay"
             :key="tram"
-            :text="tram"
+            :text="tram.toString()"
             :active="appStore.leftMenuFilters.activeRoutes.has(tram)"
             :color="routeColors[tram]"
             @click="addToFilter(tram)"
@@ -101,7 +101,7 @@
           <filter-chip
             v-for="bus in appStore.busesToDisplay"
             :key="bus"
-            :text="bus"
+            :text="bus.toString()"
             :active="appStore.leftMenuFilters.activeRoutes.has(bus)"
             :color="routeColors[bus]"
             @click="addToFilter(bus)"
@@ -127,7 +127,7 @@ const appStore = useAppStore();
 const { mobile } = useDisplay();
 const mapService = getService<IMapService>(Types.MapService);
 
-const addToFilter = (value: string) => {
+const addToFilter = (value: number) => {
   if (!appStore.activeVehicle) {
     appStore.addToRoutesFilter(value);
   }

@@ -350,14 +350,14 @@ for (const [tram] of __VLS_getVForSourceType((__VLS_ctx.appStore.tramsToDisplay)
     const __VLS_80 = __VLS_asFunctionalComponent(FilterChip, new FilterChip({
         ...{ 'onClick': {} },
         key: (tram),
-        text: (tram),
+        text: (tram.toString()),
         active: (__VLS_ctx.appStore.leftMenuFilters.activeRoutes.has(tram)),
         color: (__VLS_ctx.routeColors[tram]),
     }));
     const __VLS_81 = __VLS_80({
         ...{ 'onClick': {} },
         key: (tram),
-        text: (tram),
+        text: (tram.toString()),
         active: (__VLS_ctx.appStore.leftMenuFilters.activeRoutes.has(tram)),
         color: (__VLS_ctx.routeColors[tram]),
     }, ...__VLS_functionalComponentArgsRest(__VLS_80));
@@ -391,14 +391,14 @@ for (const [bus] of __VLS_getVForSourceType((__VLS_ctx.appStore.busesToDisplay))
     const __VLS_91 = __VLS_asFunctionalComponent(FilterChip, new FilterChip({
         ...{ 'onClick': {} },
         key: (bus),
-        text: (bus),
+        text: (bus.toString()),
         active: (__VLS_ctx.appStore.leftMenuFilters.activeRoutes.has(bus)),
         color: (__VLS_ctx.routeColors[bus]),
     }));
     const __VLS_92 = __VLS_91({
         ...{ 'onClick': {} },
         key: (bus),
-        text: (bus),
+        text: (bus.toString()),
         active: (__VLS_ctx.appStore.leftMenuFilters.activeRoutes.has(bus)),
         color: (__VLS_ctx.routeColors[bus]),
     }, ...__VLS_functionalComponentArgsRest(__VLS_91));

@@ -18,10 +18,10 @@
           v-if="appStore.activeVehicle"
           class="right_menu_toolbar_leading_vehicle_circle"
           :style="{
-            backgroundColor: getColorByRouteId(appStore.activeVehicle.trip.routeId)
+            backgroundColor: getColorByRouteId(appStore.activeVehicle.route_id)
           }"
         >
-          {{ appStore.activeVehicle.trip.routeId }}
+          {{ appStore.activeVehicle.route_id }}
         </div>
         <div class="right_menu_toolbar_leading_text">
           <div class="right_menu_toolbar_leading_text_title">
@@ -98,7 +98,7 @@ const notify = useNotifications();
 
 const menuTitle = computed(() => {
   if (appStore.activeVehicle) {
-    return `Vozilo ${appStore.activeVehicle.vehicle.id}`;
+    return `Vozilo ${appStore.activeVehicle.id}`;
   } else if (appStore.activeStop) {
     return appStore.activeStop.stopName;
   }
@@ -106,7 +106,7 @@ const menuTitle = computed(() => {
 
 const menuSubtitle = computed(() => {
   if (appStore.activeVehicle) {
-    return `Ruta ${appStore.activeVehicle.trip.routeId}`;
+    return `Ruta ${appStore.activeVehicle.route_id}`;
   } else if (appStore.activeStop) {
     return appStore.activeStop.stopId;
   }
@@ -126,14 +126,14 @@ const closeMenu = () => {
 
 const goToLocation = () => {
   if (appStore.activeVehicle) {
-    mapService.goToVehicleLocation(appStore.activeVehicle.vehicle.id);
+    mapService.goToVehicleLocation(appStore.activeVehicle.id);
   } else if (appStore.activeStop) {
     mapService.goToStopLocation(appStore.activeStop.stopId);
   }
 };
 
 const shareVehicle = () => {
-  navigator.clipboard.writeText(`${WEB_URL}${appStore.activeVehicle?.vehicle.id}`);
+  navigator.clipboard.writeText(`${WEB_URL}${appStore.activeVehicle?.id}`);
   notify.alert({
     text: "Vehicle copied to clipboard",
     type: "success"

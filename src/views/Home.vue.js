@@ -16,7 +16,6 @@ const mapService = getService(Types.MapService);
 const stopsService = getService(Types.StopsService);
 const state = reactive({
     vehicles: [],
-    tripUpdates: [],
     stops: []
 });
 let vehiclePollInterval = null;
@@ -24,31 +23,24 @@ let currentLocationPollInterval = null;
 const getData = async () => {
     try {
         appStore.loadingData = true;
-        const data = await gtfsService.getData();
-        const vehicles = data.entity.filter((x) => "vehicle" in x);
-        const tripUpdates = data.entity.filter((x) => "tripUpdate" in x).map((x) => x.tripUpdate);
-        state.tripUpdates = tripUpdates;
-        state.vehicles = vehicles.map((x) => ({
-            ...x.vehicle,
-            type: getLineType(x.vehicle.trip.routeId)
+        state.vehicles = (await gtfsService.getData()).map((x) => ({
+            ...x,
+            type: getLineType(x.route_id)
         }));
         for (const vehicle of state.vehicles) {
-            const marker = mapService.getMarker(vehicle.vehicle.id);
+            const marker = mapService.getMarker(vehicle.id);
             if (!marker) {
                 mapService.addVehicleMarker(vehicle);
             }
             else {
                 if (marker) {
-                    mapService.animateMarkerToCoords(marker, [
-                        vehicle.position.latitude,
-                        vehicle.position.longitude
-                    ]);
+                    mapService.animateMarkerToCoords(marker, [vehicle.position_lat, vehicle.position_long]);
                     mapService.rotateVehicleMarker(marker, vehicle);
                 }
             }
             mapService.updateVisibleMarkers();
         }
-        const activeVehicleIds = state.vehicles.map((x) => x.vehicle.id);
+        const activeVehicleIds = state.vehicles.map((x) => x.id);
         const vehicleMarkers = mapService.getVehicleMarkers();
         vehicleMarkers.forEach((marker, vehicleId) => {
             if (!activeVehicleIds.includes(vehicleId)) {
@@ -166,7 +158,7 @@ onMounted(async () => {
     mapService.updateVisibleMarkers();
     const routeId = router.currentRoute.value.params.id;
     if (routeId && routeId !== "home") {
-        mapService.trackVehicle(routeId);
+        mapService.trackVehicle(Number(routeId));
     }
     appStore.loading = false;
 });

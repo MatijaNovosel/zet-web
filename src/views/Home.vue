@@ -18,7 +18,6 @@ import {
 } from "@/constants/vehicle";
 import { getService, Types } from "@/di-container";
 import { getLineType } from "@/helpers/gtfs";
-import { IGTFSEntityTripUpdateModel } from "@/models/gtfs";
 import { IStopModel } from "@/models/stop";
 import { IVehicleModel } from "@/models/vehicle";
 import { useAppStore } from "@/store/app";
@@ -29,7 +28,6 @@ import { useRouter } from "vue-router";
 
 interface IState {
   vehicles: IVehicleModel[];
-  tripUpdates: IGTFSEntityTripUpdateModel[];
   stops: IStopModel[];
 }
 
@@ -43,7 +41,6 @@ const stopsService = getService<IStopsService>(Types.StopsService);
 
 const state = reactive<IState>({
   vehicles: [],
-  tripUpdates: [],
   stops: []
 });
 
@@ -54,35 +51,26 @@ const getData = async () => {
   try {
     appStore.loadingData = true;
 
-    const data = await gtfsService.getData();
-    const vehicles = data.entity.filter((x) => "vehicle" in x);
-    const tripUpdates = data.entity.filter((x) => "tripUpdate" in x).map((x) => x.tripUpdate!);
-
-    state.tripUpdates = tripUpdates;
-
-    state.vehicles = vehicles.map((x) => ({
-      ...x.vehicle!,
-      type: getLineType(x.vehicle!.trip.routeId)
+    state.vehicles = (await gtfsService.getData()).map((x) => ({
+      ...x,
+      type: getLineType(x.route_id)
     }));
 
     for (const vehicle of state.vehicles) {
-      const marker = mapService.getMarker(vehicle.vehicle.id);
+      const marker = mapService.getMarker(vehicle.id);
 
       if (!marker) {
         mapService.addVehicleMarker(vehicle);
       } else {
         if (marker) {
-          mapService.animateMarkerToCoords(marker, [
-            vehicle.position.latitude,
-            vehicle.position.longitude
-          ]);
+          mapService.animateMarkerToCoords(marker, [vehicle.position_lat, vehicle.position_long]);
           mapService.rotateVehicleMarker(marker, vehicle);
         }
       }
       mapService.updateVisibleMarkers();
     }
 
-    const activeVehicleIds = state.vehicles.map((x) => x.vehicle.id);
+    const activeVehicleIds = state.vehicles.map((x) => x.id);
 
     const vehicleMarkers = mapService.getVehicleMarkers();
 
@@ -216,7 +204,7 @@ onMounted(async () => {
   mapService.updateVisibleMarkers();
   const routeId = router.currentRoute.value.params.id;
   if (routeId && routeId !== "home") {
-    mapService.trackVehicle(routeId as string);
+    mapService.trackVehicle(Number(routeId));
   }
   appStore.loading = false;
 });

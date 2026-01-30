@@ -34,9 +34,9 @@ export function darkenHexColor(hex: string, percent: number) {
   return `#${toHex(r)}${toHex(g)}${toHex(b)}`;
 }
 
-export const getColorByRouteId = (routeId: string | undefined) => {
+export const getColorByRouteId = (routeId: number | undefined) => {
   if (routeId) {
-    return routeColors[routeId] || routeColors.default;
+    return routeColors[routeId] || routeColors[0];
   }
-  return routeColors.default;
+  return routeColors[0];
 };

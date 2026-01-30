@@ -8,8 +8,8 @@ export interface IMapService {
   updateMarkerCoords(marker: Marker, coords: [number, number]): void;
   animateMarkerToCoords(marker: Marker, coords: [number, number]): void;
   rotateVehicleMarker(marker: Marker, vehicle: IVehicleModel): void;
-  goToVehicleLocation(vehicleId: string): void;
-  removeVehicleMarker(marker: Marker, vehicleId: string): void;
+  goToVehicleLocation(vehicleId: number): void;
+  removeVehicleMarker(marker: Marker, vehicleId: number): void;
   updateCurrentLocation(coords: [number, number]): void;
   changeMapType(type: number): void;
 
@@ -17,16 +17,16 @@ export interface IMapService {
   addLayer(layer: LayerGroup): void;
 
   hideAllRoutes(): void;
-  addRouteLayer(id: string): void;
-  addRouteGeography(id: string, geography: any): void;
-  getRouteLayer(id: string): LayerGroup | undefined;
-  hasRouteGeography(id: string): boolean;
+  addRouteLayer(id: number): void;
+  addRouteGeography(id: number, geography: any): void;
+  getRouteLayer(id: number): LayerGroup | undefined;
+  hasRouteGeography(id: number): boolean;
 
-  addVehicleLayer(id: string): void;
-  getVehicleLayer(id: string): LayerGroup | undefined;
+  addVehicleLayer(id: number): void;
+  getVehicleLayer(id: number): LayerGroup | undefined;
   addVehicleMarker(vehicle: IVehicleModel): void;
 
-  getMarker(vehicleId: string): Marker | undefined;
+  getMarker(vehicleId: number): Marker | undefined;
 
   addStopMarker(stop: IStopModel): void;
 
@@ -34,9 +34,9 @@ export interface IMapService {
 
   updateVisibleMarkers(): void;
   removeActiveStopMarker(): void;
-  getVehicleMarkers(): Map<string, Marker>;
+  getVehicleMarkers(): Map<number, Marker>;
 
-  trackVehicle(vehicle: IVehicleModel | string): void;
+  trackVehicle(vehicle: IVehicleModel | number): void;
   removeActiveVehicle(): void;
   stopTrackingVehicle(): void;
   goToStopLocation(stopId: string): void;

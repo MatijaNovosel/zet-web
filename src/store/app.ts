@@ -16,7 +16,7 @@ interface ILeftMenuFilters {
   showNight: boolean;
   showRoutes: boolean;
   satelliteMap: boolean;
-  activeRoutes: Set<string>;
+  activeRoutes: Set<number>;
 }
 
 export const useAppStore = defineStore("app", () => {
@@ -72,16 +72,16 @@ export const useAppStore = defineStore("app", () => {
   };
 
   const setActiveVehicle = (vehicle: IVehicleModel | null) => {
-    if (activeVehicle.value?.vehicle.id === vehicle?.vehicle.id) return;
+    if (activeVehicle.value?.id === vehicle?.id) return;
 
     if (!vehicle) {
-      leftMenuFilters.activeRoutes.delete(activeVehicle.value?.trip.routeId!);
+      leftMenuFilters.activeRoutes.delete(activeVehicle.value?.route_id!);
     }
 
     router.replace({
       name: ROUTE_NAMES.HOME,
       params: {
-        id: vehicle === null ? "home" : vehicle?.vehicle.id
+        id: vehicle === null ? "home" : vehicle?.id
       }
     });
 
@@ -120,7 +120,7 @@ export const useAppStore = defineStore("app", () => {
     }
   });
 
-  const addToRoutesFilter = (value: string) => {
+  const addToRoutesFilter = (value: number) => {
     if (leftMenuFilters.activeRoutes.has(value)) {
       leftMenuFilters.activeRoutes.delete(value);
     } else {

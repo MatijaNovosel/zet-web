@@ -11,7 +11,7 @@ const mapService = getService(Types.MapService);
 const notify = useNotifications();
 const menuTitle = computed(() => {
     if (appStore.activeVehicle) {
-        return `Vozilo ${appStore.activeVehicle.vehicle.id}`;
+        return `Vozilo ${appStore.activeVehicle.id}`;
     }
     else if (appStore.activeStop) {
         return appStore.activeStop.stopName;
@@ -19,7 +19,7 @@ const menuTitle = computed(() => {
 });
 const menuSubtitle = computed(() => {
     if (appStore.activeVehicle) {
-        return `Ruta ${appStore.activeVehicle.trip.routeId}`;
+        return `Ruta ${appStore.activeVehicle.route_id}`;
     }
     else if (appStore.activeStop) {
         return appStore.activeStop.stopId;
@@ -37,14 +37,14 @@ const closeMenu = () => {
 };
 const goToLocation = () => {
     if (appStore.activeVehicle) {
-        mapService.goToVehicleLocation(appStore.activeVehicle.vehicle.id);
+        mapService.goToVehicleLocation(appStore.activeVehicle.id);
     }
     else if (appStore.activeStop) {
         mapService.goToStopLocation(appStore.activeStop.stopId);
     }
 };
 const shareVehicle = () => {
-    navigator.clipboard.writeText(`${WEB_URL}${appStore.activeVehicle?.vehicle.id}`);
+    navigator.clipboard.writeText(`${WEB_URL}${appStore.activeVehicle?.id}`);
     notify.alert({
         text: "Vehicle copied to clipboard",
         type: "success"
@@ -115,10 +115,10 @@ if (__VLS_ctx.appStore.activeVehicle) {
     __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
         ...{ class: "right_menu_toolbar_leading_vehicle_circle" },
         ...{ style: ({
-                backgroundColor: __VLS_ctx.getColorByRouteId(__VLS_ctx.appStore.activeVehicle.trip.routeId)
+                backgroundColor: __VLS_ctx.getColorByRouteId(__VLS_ctx.appStore.activeVehicle.route_id)
             }) },
     });
-    (__VLS_ctx.appStore.activeVehicle.trip.routeId);
+    (__VLS_ctx.appStore.activeVehicle.route_id);
 }
 __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
     ...{ class: "right_menu_toolbar_leading_text" },

@@ -24,7 +24,7 @@ const formatArrivalTime = (val) => {
 };
 const goToVehicle = (vehicleId) => {
     if (vehicleId) {
-        mapService.goToVehicleLocation(vehicleId.toString());
+        mapService.goToVehicleLocation(vehicleId);
     }
 };
 debugger; /* PartiallyEnd: #3632/scriptSetup.vue */
@@ -56,7 +56,7 @@ if (__VLS_ctx.appStore.activeStop) {
                     } },
                 ...{ class: "stop_arrivals_item_route" },
                 ...{ style: ({
-                        backgroundColor: __VLS_ctx.getColorByRouteId(arrival.routeId),
+                        backgroundColor: __VLS_ctx.getColorByRouteId(Number(arrival.routeId)),
                         cursor: arrival.vehicleId ? 'pointer' : ''
                     }) },
             });

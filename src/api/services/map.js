@@ -1,6 +1,5 @@
 import { DEFAULT_LOCATION, MapTypeEnum, POLLING_DURATION } from "@/constants/app";
 import { routeColors } from "@/constants/vehicle";
-import { computeHeading } from "@/helpers/map";
 import { darkenHexColor, getColorByRouteId } from "@/helpers/misc";
 import { useAppStore } from "@/store/app";
 import { divIcon, geoJSON, latLng, layerGroup, map, marker, tileLayer } from "leaflet";
@@ -12,7 +11,6 @@ export class MapService {
     stopMarkers = new Map();
     stopInfo = new Map();
     vehicleMarkers = new Map();
-    vehicleMarkerRotations = new Map();
     routeLinestrings = new Map();
     vehicleLayers = new Map();
     routeLayers = new Map();
@@ -136,7 +134,6 @@ export class MapService {
     }
     removeVehicleMarker(marker, vehicleId) {
         marker.remove();
-        this.vehicleMarkerRotations.delete(vehicleId);
         this.vehicleMarkers.delete(vehicleId);
     }
     animateMarkerToCoords(marker, coords) {
@@ -158,23 +155,16 @@ export class MapService {
         requestAnimationFrame(animate);
     }
     rotateVehicleMarker(marker, vehicle) {
-        const rotation = computeHeading({
-            ...marker.getLatLng()
-        }, {
-            lat: vehicle.position.latitude,
-            lng: vehicle.position.longitude
-        });
-        const color = getColorByRouteId(vehicle.trip.routeId);
+        const color = getColorByRouteId(vehicle.route_id);
         const arrowColor = darkenHexColor(color, 15);
-        const previousRotation = this.vehicleMarkerRotations.get(vehicle.vehicle.id);
-        const isActive = this.appStore?.activeVehicle?.vehicle.id === vehicle.vehicle.id;
+        const isActive = this.appStore?.activeVehicle?.id === vehicle.id;
         const newIcon = divIcon({
             html: `
           <div class="vehicle-marker ${isActive ? "active" : ""}">
             <div class="vehicle-marker-text" style="background-color: ${color};">
-              ${vehicle.trip.routeId}
+              ${vehicle.route_id}
             </div>
-            <div class="vehicle-marker-rotation" style="transform: rotate(${rotation}deg)">
+            <div class="vehicle-marker-rotation" style="transform: rotate(${vehicle.rotation_deg}deg)">
               <div class="vehicle-marker-rotation-arrow" style="border-bottom: 12px solid ${arrowColor};"></div>
             </div>
           </div>
@@ -182,16 +172,7 @@ export class MapService {
             className: "",
             iconSize: [35, 35]
         });
-        if (previousRotation) {
-            if (previousRotation !== rotation && rotation !== 0) {
-                this.vehicleMarkerRotations.set(vehicle.vehicle.id, rotation);
-                marker.setIcon(newIcon);
-            }
-        }
-        else {
-            this.vehicleMarkerRotations.set(vehicle.vehicle.id, rotation);
-            marker.setIcon(newIcon);
-        }
+        marker.setIcon(newIcon);
     }
     removeLayer(layer) {
         this.map.removeLayer(layer);
@@ -231,13 +212,13 @@ export class MapService {
         this.routeLayers.set(id, layer);
     }
     addVehicleMarker(vehicle) {
-        const color = getColorByRouteId(vehicle.trip.routeId);
-        const newMarker = marker([vehicle.position.latitude, vehicle.position.longitude], {
+        const color = getColorByRouteId(vehicle.route_id);
+        const newMarker = marker([vehicle.position_lat, vehicle.position_long], {
             icon: divIcon({
                 html: `
           <div class="vehicle-marker" style="background-color: ${color};">
             <div class="vehicle-marker-text">
-              ${vehicle.trip.routeId}
+              ${vehicle.route_id}
             </div>
             <div class="vehicle-marker-rotation">
           </div>
@@ -251,18 +232,18 @@ export class MapService {
         newMarker.data = vehicle;
         newMarker.addEventListener("click", () => {
             this.appStore?.leftMenuFilters.activeRoutes.clear();
-            if (!this.appStore?.leftMenuFilters.activeRoutes.has(vehicle.trip.routeId)) {
-                this.appStore.addToRoutesFilter(vehicle.trip.routeId);
+            if (!this.appStore?.leftMenuFilters.activeRoutes.has(vehicle.route_id)) {
+                this.appStore.addToRoutesFilter(vehicle.route_id);
             }
             this.appStore?.setActiveVehicle(vehicle);
             this.appStore.setActiveStop(null);
             this.appStore.trackingVehicle = false;
             this.goToLocation([newMarker.getLatLng().lat, newMarker.getLatLng().lng]);
         });
-        this.vehicleMarkers.set(vehicle.vehicle.id, newMarker);
-        this.vehicleRouteMap.set(vehicle.vehicle.id, vehicle.trip.routeId);
-        const layer = this.getVehicleLayer(vehicle.trip.routeId);
-        if (layer && this.isInViewport([vehicle.position.latitude, vehicle.position.longitude])) {
+        this.vehicleMarkers.set(vehicle.id, newMarker);
+        this.vehicleRouteMap.set(vehicle.id, vehicle.route_id);
+        const layer = this.getVehicleLayer(vehicle.route_id);
+        if (layer && this.isInViewport([vehicle.position_lat, vehicle.position_long])) {
             newMarker.addTo(layer);
         }
     }
@@ -321,18 +302,18 @@ export class MapService {
     }
     trackVehicle(vehicle) {
         let marker = undefined;
-        if (typeof vehicle === "string") {
+        if (typeof vehicle === "number") {
             marker = this.vehicleMarkers.get(vehicle);
             // @ts-ignore
             const data = marker.data;
             this.appStore?.setActiveVehicle(data);
             this.appStore.trackingVehicle = true;
-            if (!this.appStore?.leftMenuFilters.activeRoutes.has(data.trip.routeId)) {
-                this.appStore.addToRoutesFilter(data.trip.routeId);
+            if (!this.appStore?.leftMenuFilters.activeRoutes.has(data.route_id)) {
+                this.appStore.addToRoutesFilter(data.route_id);
             }
         }
         else {
-            marker = this.vehicleMarkers.get(vehicle.vehicle.id);
+            marker = this.vehicleMarkers.get(vehicle.id);
         }
         if (marker) {
             this.goToLocation([marker.getLatLng().lat, marker.getLatLng().lng]);
@@ -359,7 +340,7 @@ export class MapService {
         }
     }
     removeActiveVehicle() {
-        const vehicleId = this.appStore?.activeVehicle?.vehicle.id;
+        const vehicleId = this.appStore?.activeVehicle?.id;
         if (vehicleId) {
             const marker = this.vehicleMarkers.get(vehicleId);
             if (marker) {
