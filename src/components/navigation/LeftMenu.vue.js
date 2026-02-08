@@ -1,7 +1,6 @@
 /// <reference types="../../../node_modules/.vue-global-types/vue_3.5_0_0_0.d.ts" />
 import { useAppStore } from "@/store/app";
 import { computed } from "vue";
-import { version } from "../../../package.json";
 import Filters from "../filters/Filters.vue";
 const appStore = useAppStore();
 const leftMenuStyle = computed(() => ({
@@ -22,12 +21,12 @@ const __VLS_0 = {}.VListItem;
 // @ts-ignore
 const __VLS_1 = __VLS_asFunctionalComponent(__VLS_0, new __VLS_0({
     title: "ZET Web",
-    subtitle: (__VLS_ctx.version),
+    subtitle: "ZET tramvaji i autobusi uživo - interaktivna karta Zagreba u stvarnom vremenu",
     ...{ class: "text-subtitle-2 py-3" },
 }));
 const __VLS_2 = __VLS_1({
     title: "ZET Web",
-    subtitle: (__VLS_ctx.version),
+    subtitle: "ZET tramvaji i autobusi uživo - interaktivna karta Zagreba u stvarnom vremenu",
     ...{ class: "text-subtitle-2 py-3" },
 }, ...__VLS_functionalComponentArgsRest(__VLS_1));
 __VLS_3.slots.default;
@@ -123,7 +122,6 @@ var __VLS_dollars;
 const __VLS_self = (await import('vue')).defineComponent({
     setup() {
         return {
-            version: version,
             Filters: Filters,
             appStore: appStore,
             leftMenuStyle: leftMenuStyle,

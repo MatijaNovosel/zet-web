@@ -2,7 +2,6 @@
 import { useAppStore } from "@/store/app";
 import { ref } from "vue";
 import { useDisplay } from "vuetify";
-import { version } from "../../../package.json";
 import Filters from "../filters/Filters.vue";
 const appStore = useAppStore();
 const { mobile } = useDisplay();
@@ -64,12 +63,12 @@ __VLS_11.slots.default;
     // @ts-ignore
     const __VLS_13 = __VLS_asFunctionalComponent(__VLS_12, new __VLS_12({
         title: "ZET Web",
-        subtitle: (__VLS_ctx.version),
+        subtitle: "ZET tramvaji i autobusi uživo – interaktivna karta Zagreba u stvarnom vremenu",
         ...{ class: "text-subtitle-2 py-3" },
     }));
     const __VLS_14 = __VLS_13({
         title: "ZET Web",
-        subtitle: (__VLS_ctx.version),
+        subtitle: "ZET tramvaji i autobusi uživo – interaktivna karta Zagreba u stvarnom vremenu",
         ...{ class: "text-subtitle-2 py-3" },
     }, ...__VLS_functionalComponentArgsRest(__VLS_13));
     __VLS_15.slots.default;
@@ -154,7 +153,6 @@ var __VLS_dollars;
 const __VLS_self = (await import('vue')).defineComponent({
     setup() {
         return {
-            version: version,
             Filters: Filters,
             appStore: appStore,
             mobile: mobile,

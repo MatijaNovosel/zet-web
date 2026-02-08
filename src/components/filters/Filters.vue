@@ -134,7 +134,7 @@ const addToFilter = (value: number) => {
 };
 
 const filtersStyle = computed(() => ({
-  height: mobile.value ? "" : "calc(100% - 104px)"
+  height: mobile.value ? "" : "calc(100% - 120px)"
 }));
 
 const allTramsShowing = computed(() => {

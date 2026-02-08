@@ -15,7 +15,7 @@
     <template #prepend>
       <v-list-item
         title="ZET Web"
-        :subtitle="version"
+        subtitle="ZET tramvaji i autobusi uživo – interaktivna karta Zagreba u stvarnom vremenu"
         class="text-subtitle-2 py-3"
       >
         <template #prepend>
@@ -52,7 +52,6 @@
 import { useAppStore } from "@/store/app";
 import { ref } from "vue";
 import { useDisplay } from "vuetify";
-import { version } from "../../../package.json";
 import Filters from "../filters/Filters.vue";
 
 const appStore = useAppStore();

@@ -16,7 +16,7 @@ const addToFilter = (value) => {
     }
 };
 const filtersStyle = computed(() => ({
-    height: mobile.value ? "" : "calc(100% - 104px)"
+    height: mobile.value ? "" : "calc(100% - 120px)"
 }));
 const allTramsShowing = computed(() => {
     return allTramLines.every((x) => appStore.leftMenuFilters.activeRoutes.has(x));
