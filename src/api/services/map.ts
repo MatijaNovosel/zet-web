@@ -1,19 +1,22 @@
 import { DEFAULT_LOCATION, MapTypeEnum, POLLING_DURATION } from "@/constants/app";
 import { routeColors } from "@/constants/vehicle";
 import { darkenHexColor, getColorByRouteId } from "@/helpers/misc";
-import { IStopModel } from "@/models/stop";
+import { IBajsStopModel, IStopModel } from "@/models/stop";
 import { IVehicleModel } from "@/models/vehicle";
 import { useAppStore } from "@/store/app";
 import {
   divIcon,
   geoJSON,
+  icon,
   latLng,
+  LatLngBounds,
   layerGroup,
   LayerGroup,
   Map as LeafletMap,
   map,
   marker,
   Marker,
+  point,
   TileLayer,
   tileLayer
 } from "leaflet";
@@ -24,13 +27,18 @@ export class MapService implements IMapService {
   appStore: ReturnType<typeof useAppStore> | null = null;
   currentLocationMarker: Marker | null = null;
   activeStopMarker: Marker | null = null;
+  // Bajs
+  bajsStopMarkers: Map<number, Marker> = new Map();
+  bajsStopInfo: Map<number, IBajsStopModel> = new Map();
+  bajsLayer: LayerGroup | null = null;
+  // Stops
   stopMarkers: Map<string, Marker> = new Map();
   stopInfo: Map<string, IStopModel> = new Map();
   vehicleMarkers: Map<number, Marker> = new Map();
   routeLinestrings: Map<string, Marker> = new Map();
   vehicleLayers: Map<number, LayerGroup> = new Map();
-  routeLayers: Map<number, LayerGroup> = new Map();
   stopLayer: LayerGroup | null = null;
+  routeLayers: Map<number, LayerGroup> = new Map();
   // Relacija vehicleId -> routeId
   vehicleRouteMap: Map<number, number> = new Map();
   tileLayer: TileLayer | null = null;
@@ -94,6 +102,13 @@ export class MapService implements IMapService {
     });
   }
 
+  _updateMarkerVisibility = (bounds: LatLngBounds, marker: Marker) => {
+    const latlng = marker.getLatLng();
+    const isVisible = bounds.contains(latlng);
+    if (isVisible) marker.addTo(this.map!);
+    else marker.removeFrom(this.map!);
+  };
+
   updateVisibleMarkers(): void {
     if (!this.map) return;
 
@@ -110,24 +125,20 @@ export class MapService implements IMapService {
       const isVisible = bounds.contains(latlng);
       const isInLayer = layer.hasLayer(marker);
 
-      if (isVisible && !isInLayer) {
-        marker.addTo(layer);
-      } else if (!isVisible && isInLayer) {
-        layer.removeLayer(marker);
-      }
+      if (isVisible && !isInLayer) marker.addTo(layer);
+      else if (!isVisible && isInLayer) layer.removeLayer(marker);
     });
+
+    if (this.appStore?.leftMenuFilters.bajsStops) {
+      this.bajsStopMarkers.forEach((marker) => {
+        this._updateMarkerVisibility(bounds, marker);
+      });
+    }
 
     if (this.map.getZoom() >= 15.5) {
       this.map.addLayer(this.stopLayer!);
-      this.stopMarkers.forEach((marker, id) => {
-        const latlng = marker.getLatLng();
-        const isVisible = bounds.contains(latlng);
-
-        if (isVisible) {
-          marker.addTo(this.map!);
-        } else {
-          marker.removeFrom(this.map!);
-        }
+      this.stopMarkers.forEach((marker) => {
+        this._updateMarkerVisibility(bounds, marker);
       });
     } else {
       this.map.removeLayer(this.stopLayer!);
@@ -150,6 +161,7 @@ export class MapService implements IMapService {
 
     this.map!.on("moveend zoomend", () => this.updateVisibleMarkers());
     this.stopLayer = layerGroup();
+    this.bajsLayer = layerGroup();
 
     this.map!.createPane("priorityMarkers");
     this.map!.getPane("priorityMarkers")!.style.zIndex = "9999";
@@ -430,6 +442,36 @@ export class MapService implements IMapService {
       if (marker) {
         marker.getElement()?.classList.remove("active");
       }
+    }
+  }
+
+  addBajsStopMarker(stop: IBajsStopModel): void {
+    const newMarker = marker([stop.lat, stop.lng], {
+      icon: icon({
+        iconUrl: "/icons/bikePin.svg",
+        iconSize: [48, 48]
+      })
+    });
+
+    newMarker.addEventListener("click", async () => {
+      this.goToLocation([stop.lat, stop.lng]);
+    });
+
+    newMarker.bindTooltip(stop.name, {
+      offset: point(15, 0)
+    });
+
+    this.bajsStopMarkers.set(stop.uid, newMarker);
+    this.bajsStopInfo.set(stop.uid, stop);
+
+    newMarker.addTo(this.bajsLayer!);
+  }
+
+  toggleBajsStops(): void {
+    if (!this.appStore?.leftMenuFilters.bajsStops) {
+      this.map?.removeLayer(this.bajsLayer!);
+    } else {
+      this.map?.addLayer(this.bajsLayer!);
     }
   }
 }

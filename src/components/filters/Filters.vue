@@ -35,6 +35,19 @@
         flat
         variant="text"
         size="30px"
+        :color="appStore.leftMenuFilters.bajsStops ? 'blue' : 'grey'"
+        :disabled="shouldDisableControls"
+        @click="toggleBajsStops"
+      >
+        <v-tooltip activator="parent"> Prikaži Bajs stanice </v-tooltip>
+        <v-icon> mdi-bicycle </v-icon>
+      </v-btn>
+      <v-btn
+        class="ml-3"
+        icon
+        flat
+        variant="text"
+        size="30px"
         color="blue"
         @click="goToCurrentLocation"
       >
@@ -175,6 +188,10 @@ const toggleTrams = () => {
       appStore.leftMenuFilters.activeRoutes.add(x);
     });
   }
+};
+
+const toggleBajsStops = () => {
+  appStore.leftMenuFilters.bajsStops = !appStore.leftMenuFilters.bajsStops;
 };
 
 const goToCurrentLocation = async () => {

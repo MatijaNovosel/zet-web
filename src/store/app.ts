@@ -16,6 +16,7 @@ interface ILeftMenuFilters {
   showNight: boolean;
   showRoutes: boolean;
   satelliteMap: boolean;
+  bajsStops: boolean;
   activeRoutes: Set<number>;
 }
 
@@ -42,6 +43,7 @@ export const useAppStore = defineStore("app", () => {
     showNight: true,
     showRoutes: false,
     satelliteMap: false,
+    bajsStops: false,
     activeRoutes: new Set()
   });
 

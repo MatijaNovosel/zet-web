@@ -25,6 +25,7 @@ export const useAppStore = defineStore("app", () => {
         showNight: true,
         showRoutes: false,
         satelliteMap: false,
+        bajsStops: false,
         activeRoutes: new Set()
     });
     let progressInterval;

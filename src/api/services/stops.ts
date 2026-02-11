@@ -1,4 +1,4 @@
-import { IStopArrivalModel, IStopModel } from "@/models/stop";
+import { IBajsStopModel, IStopArrivalModel, IStopModel } from "@/models/stop";
 import client from "@/plugins/axios";
 import { IStopsService } from "../interfaces/stops";
 
@@ -19,5 +19,10 @@ export class StopsService implements IStopsService {
       stopLat: x.stop_lat,
       stopLon: x.stop_lon
     }));
+  }
+
+  async getBajsStops(): Promise<IBajsStopModel[]> {
+    const { data } = await client.get("/bajs");
+    return data;
   }
 }

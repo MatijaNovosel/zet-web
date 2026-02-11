@@ -13,4 +13,8 @@ export class StopsService {
             stopLon: x.stop_lon
         }));
     }
+    async getBajsStops() {
+        const { data } = await client.get("/bajs");
+        return data;
+    }
 }

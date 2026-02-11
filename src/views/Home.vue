@@ -18,7 +18,7 @@ import {
 } from "@/constants/vehicle";
 import { getService, Types } from "@/di-container";
 import { getLineType } from "@/helpers/gtfs";
-import { IStopModel } from "@/models/stop";
+import { IBajsStopModel, IStopModel } from "@/models/stop";
 import { IVehicleModel } from "@/models/vehicle";
 import { useAppStore } from "@/store/app";
 import { Capacitor } from "@capacitor/core";
@@ -29,6 +29,7 @@ import { useRouter } from "vue-router";
 interface IState {
   vehicles: IVehicleModel[];
   stops: IStopModel[];
+  bajsStops: IBajsStopModel[];
 }
 
 const appStore = useAppStore();
@@ -41,7 +42,8 @@ const stopsService = getService<IStopsService>(Types.StopsService);
 
 const state = reactive<IState>({
   vehicles: [],
-  stops: []
+  stops: [],
+  bajsStops: []
 });
 
 let vehiclePollInterval: NodeJS.Timeout | null = null;
@@ -105,6 +107,14 @@ const getStops = async () => {
   state.stops = data;
   for (const stop of data) {
     mapService.addStopMarker(stop);
+  }
+};
+
+const getBajsStops = async () => {
+  const data = await stopsService.getBajsStops();
+  state.bajsStops = data;
+  for (const stop of data) {
+    mapService.addBajsStopMarker(stop);
   }
 };
 
@@ -194,27 +204,37 @@ watch(
   }
 );
 
-onMounted(async () => {
-  appStore.loading = true;
-  mapService.createMap();
-  createLayers();
-  await getStops();
-  await pollData();
-  pollCurrentLocation();
-  mapService.updateVisibleMarkers();
-  const routeId = router.currentRoute.value.params.id;
-  if (routeId && routeId !== "home") {
-    mapService.trackVehicle(Number(routeId));
+watch(
+  () => appStore.leftMenuFilters.bajsStops,
+  () => {
+    mapService.toggleBajsStops();
+  },
+  {
+    immediate: true
   }
-  appStore.loading = false;
+);
+
+onMounted(async () => {
+  try {
+    appStore.loading = true;
+    mapService.createMap();
+    createLayers();
+    await getStops();
+    await getBajsStops();
+    await pollData();
+    pollCurrentLocation();
+    mapService.updateVisibleMarkers();
+    const routeId = router.currentRoute.value.params.id;
+    if (routeId && routeId !== "home") {
+      mapService.trackVehicle(Number(routeId));
+    }
+  } finally {
+    appStore.loading = false;
+  }
 });
 
 onUnmounted(() => {
-  if (vehiclePollInterval) {
-    clearInterval(vehiclePollInterval);
-  }
-  if (currentLocationPollInterval) {
-    clearInterval(currentLocationPollInterval);
-  }
+  if (vehiclePollInterval) clearInterval(vehiclePollInterval);
+  if (currentLocationPollInterval) clearInterval(currentLocationPollInterval);
 });
 </script>

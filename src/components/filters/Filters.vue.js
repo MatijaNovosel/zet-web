@@ -53,6 +53,9 @@ const toggleTrams = () => {
         });
     }
 };
+const toggleBajsStops = () => {
+    appStore.leftMenuFilters.bajsStops = !appStore.leftMenuFilters.bajsStops;
+};
 const goToCurrentLocation = async () => {
     if (Capacitor.isNativePlatform()) {
         const pos = await Geolocation.getCurrentPosition();
@@ -185,7 +188,8 @@ const __VLS_33 = __VLS_asFunctionalComponent(__VLS_32, new __VLS_32({
     flat: true,
     variant: "text",
     size: "30px",
-    color: "blue",
+    color: (__VLS_ctx.appStore.leftMenuFilters.bajsStops ? 'blue' : 'grey'),
+    disabled: (__VLS_ctx.shouldDisableControls),
 }));
 const __VLS_34 = __VLS_33({
     ...{ 'onClick': {} },
@@ -194,13 +198,14 @@ const __VLS_34 = __VLS_33({
     flat: true,
     variant: "text",
     size: "30px",
-    color: "blue",
+    color: (__VLS_ctx.appStore.leftMenuFilters.bajsStops ? 'blue' : 'grey'),
+    disabled: (__VLS_ctx.shouldDisableControls),
 }, ...__VLS_functionalComponentArgsRest(__VLS_33));
 let __VLS_36;
 let __VLS_37;
 let __VLS_38;
 const __VLS_39 = {
-    onClick: (__VLS_ctx.goToCurrentLocation)
+    onClick: (__VLS_ctx.toggleBajsStops)
 };
 __VLS_35.slots.default;
 const __VLS_40 = {}.VTooltip;
@@ -232,8 +237,7 @@ const __VLS_49 = __VLS_asFunctionalComponent(__VLS_48, new __VLS_48({
     flat: true,
     variant: "text",
     size: "30px",
-    color: (__VLS_ctx.filtersActive ? 'blue-lighten-1' : 'grey'),
-    disabled: (__VLS_ctx.shouldDisableControls),
+    color: "blue",
 }));
 const __VLS_50 = __VLS_49({
     ...{ 'onClick': {} },
@@ -242,14 +246,13 @@ const __VLS_50 = __VLS_49({
     flat: true,
     variant: "text",
     size: "30px",
-    color: (__VLS_ctx.filtersActive ? 'blue-lighten-1' : 'grey'),
-    disabled: (__VLS_ctx.shouldDisableControls),
+    color: "blue",
 }, ...__VLS_functionalComponentArgsRest(__VLS_49));
 let __VLS_52;
 let __VLS_53;
 let __VLS_54;
 const __VLS_55 = {
-    onClick: (__VLS_ctx.clearFilters)
+    onClick: (__VLS_ctx.goToCurrentLocation)
 };
 __VLS_51.slots.default;
 const __VLS_56 = {}.VTooltip;
@@ -271,67 +274,116 @@ const __VLS_62 = __VLS_61({}, ...__VLS_functionalComponentArgsRest(__VLS_61));
 __VLS_63.slots.default;
 var __VLS_63;
 var __VLS_51;
-const __VLS_64 = {}.VDivider;
-/** @type {[typeof __VLS_components.VDivider, typeof __VLS_components.vDivider, ]} */ ;
+const __VLS_64 = {}.VBtn;
+/** @type {[typeof __VLS_components.VBtn, typeof __VLS_components.vBtn, typeof __VLS_components.VBtn, typeof __VLS_components.vBtn, ]} */ ;
 // @ts-ignore
-const __VLS_65 = __VLS_asFunctionalComponent(__VLS_64, new __VLS_64({}));
-const __VLS_66 = __VLS_65({}, ...__VLS_functionalComponentArgsRest(__VLS_65));
-__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
-    ...{ class: "d-flex pl-2 py-1 ga-2" },
-});
-const __VLS_68 = {}.VCheckbox;
-/** @type {[typeof __VLS_components.VCheckbox, typeof __VLS_components.vCheckbox, typeof __VLS_components.VCheckbox, typeof __VLS_components.vCheckbox, ]} */ ;
-// @ts-ignore
-const __VLS_69 = __VLS_asFunctionalComponent(__VLS_68, new __VLS_68({
-    modelValue: (__VLS_ctx.appStore.leftMenuFilters.showNight),
-    hideDetails: true,
-    color: "blue",
-    density: "compact",
+const __VLS_65 = __VLS_asFunctionalComponent(__VLS_64, new __VLS_64({
+    ...{ 'onClick': {} },
+    ...{ class: "ml-3" },
+    icon: true,
+    flat: true,
+    variant: "text",
+    size: "30px",
+    color: (__VLS_ctx.filtersActive ? 'blue-lighten-1' : 'grey'),
     disabled: (__VLS_ctx.shouldDisableControls),
 }));
-const __VLS_70 = __VLS_69({
-    modelValue: (__VLS_ctx.appStore.leftMenuFilters.showNight),
-    hideDetails: true,
-    color: "blue",
-    density: "compact",
+const __VLS_66 = __VLS_65({
+    ...{ 'onClick': {} },
+    ...{ class: "ml-3" },
+    icon: true,
+    flat: true,
+    variant: "text",
+    size: "30px",
+    color: (__VLS_ctx.filtersActive ? 'blue-lighten-1' : 'grey'),
     disabled: (__VLS_ctx.shouldDisableControls),
-}, ...__VLS_functionalComponentArgsRest(__VLS_69));
-__VLS_71.slots.default;
-{
-    const { label: __VLS_thisSlot } = __VLS_71.slots;
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
-        ...{ class: "route_display_label" },
-    });
-}
-var __VLS_71;
-const __VLS_72 = {}.VCheckbox;
-/** @type {[typeof __VLS_components.VCheckbox, typeof __VLS_components.vCheckbox, typeof __VLS_components.VCheckbox, typeof __VLS_components.vCheckbox, ]} */ ;
+}, ...__VLS_functionalComponentArgsRest(__VLS_65));
+let __VLS_68;
+let __VLS_69;
+let __VLS_70;
+const __VLS_71 = {
+    onClick: (__VLS_ctx.clearFilters)
+};
+__VLS_67.slots.default;
+const __VLS_72 = {}.VTooltip;
+/** @type {[typeof __VLS_components.VTooltip, typeof __VLS_components.vTooltip, typeof __VLS_components.VTooltip, typeof __VLS_components.vTooltip, ]} */ ;
 // @ts-ignore
 const __VLS_73 = __VLS_asFunctionalComponent(__VLS_72, new __VLS_72({
-    modelValue: (__VLS_ctx.appStore.leftMenuFilters.satelliteMap),
-    hideDetails: true,
-    color: "blue",
-    density: "compact",
+    activator: "parent",
 }));
 const __VLS_74 = __VLS_73({
-    modelValue: (__VLS_ctx.appStore.leftMenuFilters.satelliteMap),
-    hideDetails: true,
-    color: "blue",
-    density: "compact",
+    activator: "parent",
 }, ...__VLS_functionalComponentArgsRest(__VLS_73));
 __VLS_75.slots.default;
-{
-    const { label: __VLS_thisSlot } = __VLS_75.slots;
-    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
-        ...{ class: "route_display_label" },
-    });
-}
 var __VLS_75;
-const __VLS_76 = {}.VDivider;
-/** @type {[typeof __VLS_components.VDivider, typeof __VLS_components.vDivider, ]} */ ;
+const __VLS_76 = {}.VIcon;
+/** @type {[typeof __VLS_components.VIcon, typeof __VLS_components.vIcon, typeof __VLS_components.VIcon, typeof __VLS_components.vIcon, ]} */ ;
 // @ts-ignore
 const __VLS_77 = __VLS_asFunctionalComponent(__VLS_76, new __VLS_76({}));
 const __VLS_78 = __VLS_77({}, ...__VLS_functionalComponentArgsRest(__VLS_77));
+__VLS_79.slots.default;
+var __VLS_79;
+var __VLS_67;
+const __VLS_80 = {}.VDivider;
+/** @type {[typeof __VLS_components.VDivider, typeof __VLS_components.vDivider, ]} */ ;
+// @ts-ignore
+const __VLS_81 = __VLS_asFunctionalComponent(__VLS_80, new __VLS_80({}));
+const __VLS_82 = __VLS_81({}, ...__VLS_functionalComponentArgsRest(__VLS_81));
+__VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+    ...{ class: "d-flex pl-2 py-1 ga-2" },
+});
+const __VLS_84 = {}.VCheckbox;
+/** @type {[typeof __VLS_components.VCheckbox, typeof __VLS_components.vCheckbox, typeof __VLS_components.VCheckbox, typeof __VLS_components.vCheckbox, ]} */ ;
+// @ts-ignore
+const __VLS_85 = __VLS_asFunctionalComponent(__VLS_84, new __VLS_84({
+    modelValue: (__VLS_ctx.appStore.leftMenuFilters.showNight),
+    hideDetails: true,
+    color: "blue",
+    density: "compact",
+    disabled: (__VLS_ctx.shouldDisableControls),
+}));
+const __VLS_86 = __VLS_85({
+    modelValue: (__VLS_ctx.appStore.leftMenuFilters.showNight),
+    hideDetails: true,
+    color: "blue",
+    density: "compact",
+    disabled: (__VLS_ctx.shouldDisableControls),
+}, ...__VLS_functionalComponentArgsRest(__VLS_85));
+__VLS_87.slots.default;
+{
+    const { label: __VLS_thisSlot } = __VLS_87.slots;
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+        ...{ class: "route_display_label" },
+    });
+}
+var __VLS_87;
+const __VLS_88 = {}.VCheckbox;
+/** @type {[typeof __VLS_components.VCheckbox, typeof __VLS_components.vCheckbox, typeof __VLS_components.VCheckbox, typeof __VLS_components.vCheckbox, ]} */ ;
+// @ts-ignore
+const __VLS_89 = __VLS_asFunctionalComponent(__VLS_88, new __VLS_88({
+    modelValue: (__VLS_ctx.appStore.leftMenuFilters.satelliteMap),
+    hideDetails: true,
+    color: "blue",
+    density: "compact",
+}));
+const __VLS_90 = __VLS_89({
+    modelValue: (__VLS_ctx.appStore.leftMenuFilters.satelliteMap),
+    hideDetails: true,
+    color: "blue",
+    density: "compact",
+}, ...__VLS_functionalComponentArgsRest(__VLS_89));
+__VLS_91.slots.default;
+{
+    const { label: __VLS_thisSlot } = __VLS_91.slots;
+    __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
+        ...{ class: "route_display_label" },
+    });
+}
+var __VLS_91;
+const __VLS_92 = {}.VDivider;
+/** @type {[typeof __VLS_components.VDivider, typeof __VLS_components.vDivider, ]} */ ;
+// @ts-ignore
+const __VLS_93 = __VLS_asFunctionalComponent(__VLS_92, new __VLS_92({}));
+const __VLS_94 = __VLS_93({}, ...__VLS_functionalComponentArgsRest(__VLS_93));
 __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
     ...{ class: "vehicle_filters" },
 });
@@ -347,35 +399,35 @@ __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.d
 for (const [tram] of __VLS_getVForSourceType((__VLS_ctx.appStore.tramsToDisplay))) {
     /** @type {[typeof FilterChip, ]} */ ;
     // @ts-ignore
-    const __VLS_80 = __VLS_asFunctionalComponent(FilterChip, new FilterChip({
+    const __VLS_96 = __VLS_asFunctionalComponent(FilterChip, new FilterChip({
         ...{ 'onClick': {} },
         key: (tram),
         text: (tram.toString()),
         active: (__VLS_ctx.appStore.leftMenuFilters.activeRoutes.has(tram)),
         color: (__VLS_ctx.routeColors[tram]),
     }));
-    const __VLS_81 = __VLS_80({
+    const __VLS_97 = __VLS_96({
         ...{ 'onClick': {} },
         key: (tram),
         text: (tram.toString()),
         active: (__VLS_ctx.appStore.leftMenuFilters.activeRoutes.has(tram)),
         color: (__VLS_ctx.routeColors[tram]),
-    }, ...__VLS_functionalComponentArgsRest(__VLS_80));
-    let __VLS_83;
-    let __VLS_84;
-    let __VLS_85;
-    const __VLS_86 = {
+    }, ...__VLS_functionalComponentArgsRest(__VLS_96));
+    let __VLS_99;
+    let __VLS_100;
+    let __VLS_101;
+    const __VLS_102 = {
         onClick: (...[$event]) => {
             __VLS_ctx.addToFilter(tram);
         }
     };
-    var __VLS_82;
+    var __VLS_98;
 }
-const __VLS_87 = {}.VDivider;
+const __VLS_103 = {}.VDivider;
 /** @type {[typeof __VLS_components.VDivider, typeof __VLS_components.vDivider, ]} */ ;
 // @ts-ignore
-const __VLS_88 = __VLS_asFunctionalComponent(__VLS_87, new __VLS_87({}));
-const __VLS_89 = __VLS_88({}, ...__VLS_functionalComponentArgsRest(__VLS_88));
+const __VLS_104 = __VLS_asFunctionalComponent(__VLS_103, new __VLS_103({}));
+const __VLS_105 = __VLS_104({}, ...__VLS_functionalComponentArgsRest(__VLS_104));
 __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.div)({
     ...{ class: "flex-column column justify-center my-2" },
 });
@@ -388,34 +440,35 @@ __VLS_asFunctionalElement(__VLS_intrinsicElements.div, __VLS_intrinsicElements.d
 for (const [bus] of __VLS_getVForSourceType((__VLS_ctx.appStore.busesToDisplay))) {
     /** @type {[typeof FilterChip, ]} */ ;
     // @ts-ignore
-    const __VLS_91 = __VLS_asFunctionalComponent(FilterChip, new FilterChip({
+    const __VLS_107 = __VLS_asFunctionalComponent(FilterChip, new FilterChip({
         ...{ 'onClick': {} },
         key: (bus),
         text: (bus.toString()),
         active: (__VLS_ctx.appStore.leftMenuFilters.activeRoutes.has(bus)),
         color: (__VLS_ctx.routeColors[bus]),
     }));
-    const __VLS_92 = __VLS_91({
+    const __VLS_108 = __VLS_107({
         ...{ 'onClick': {} },
         key: (bus),
         text: (bus.toString()),
         active: (__VLS_ctx.appStore.leftMenuFilters.activeRoutes.has(bus)),
         color: (__VLS_ctx.routeColors[bus]),
-    }, ...__VLS_functionalComponentArgsRest(__VLS_91));
-    let __VLS_94;
-    let __VLS_95;
-    let __VLS_96;
-    const __VLS_97 = {
+    }, ...__VLS_functionalComponentArgsRest(__VLS_107));
+    let __VLS_110;
+    let __VLS_111;
+    let __VLS_112;
+    const __VLS_113 = {
         onClick: (...[$event]) => {
             __VLS_ctx.addToFilter(bus);
         }
     };
-    var __VLS_93;
+    var __VLS_109;
 }
 /** @type {__VLS_StyleScopedClasses['filters']} */ ;
 /** @type {__VLS_StyleScopedClasses['d-flex']} */ ;
 /** @type {__VLS_StyleScopedClasses['justify-center']} */ ;
 /** @type {__VLS_StyleScopedClasses['my-2']} */ ;
+/** @type {__VLS_StyleScopedClasses['ml-3']} */ ;
 /** @type {__VLS_StyleScopedClasses['ml-3']} */ ;
 /** @type {__VLS_StyleScopedClasses['ml-3']} */ ;
 /** @type {__VLS_StyleScopedClasses['ml-3']} */ ;
@@ -466,6 +519,7 @@ const __VLS_self = (await import('vue')).defineComponent({
             shouldDisableControls: shouldDisableControls,
             toggleBuses: toggleBuses,
             toggleTrams: toggleTrams,
+            toggleBajsStops: toggleBajsStops,
             goToCurrentLocation: goToCurrentLocation,
         };
     },

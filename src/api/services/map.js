@@ -2,19 +2,24 @@ import { DEFAULT_LOCATION, MapTypeEnum, POLLING_DURATION } from "@/constants/app
 import { routeColors } from "@/constants/vehicle";
 import { darkenHexColor, getColorByRouteId } from "@/helpers/misc";
 import { useAppStore } from "@/store/app";
-import { divIcon, geoJSON, latLng, layerGroup, map, marker, tileLayer } from "leaflet";
+import { divIcon, geoJSON, icon, latLng, layerGroup, map, marker, point, tileLayer } from "leaflet";
 export class MapService {
     map = null;
     appStore = null;
     currentLocationMarker = null;
     activeStopMarker = null;
+    // Bajs
+    bajsStopMarkers = new Map();
+    bajsStopInfo = new Map();
+    bajsLayer = null;
+    // Stops
     stopMarkers = new Map();
     stopInfo = new Map();
     vehicleMarkers = new Map();
     routeLinestrings = new Map();
     vehicleLayers = new Map();
-    routeLayers = new Map();
     stopLayer = null;
+    routeLayers = new Map();
     // Relacija vehicleId -> routeId
     vehicleRouteMap = new Map();
     tileLayer = null;
@@ -70,6 +75,14 @@ export class MapService {
             iconSize: [35, 35]
         });
     }
+    _updateMarkerVisibility = (bounds, marker) => {
+        const latlng = marker.getLatLng();
+        const isVisible = bounds.contains(latlng);
+        if (isVisible)
+            marker.addTo(this.map);
+        else
+            marker.removeFrom(this.map);
+    };
     updateVisibleMarkers() {
         if (!this.map)
             return;
@@ -84,24 +97,20 @@ export class MapService {
             const latlng = marker.getLatLng();
             const isVisible = bounds.contains(latlng);
             const isInLayer = layer.hasLayer(marker);
-            if (isVisible && !isInLayer) {
+            if (isVisible && !isInLayer)
                 marker.addTo(layer);
-            }
-            else if (!isVisible && isInLayer) {
+            else if (!isVisible && isInLayer)
                 layer.removeLayer(marker);
-            }
         });
+        if (this.appStore?.leftMenuFilters.bajsStops) {
+            this.bajsStopMarkers.forEach((marker) => {
+                this._updateMarkerVisibility(bounds, marker);
+            });
+        }
         if (this.map.getZoom() >= 15.5) {
             this.map.addLayer(this.stopLayer);
-            this.stopMarkers.forEach((marker, id) => {
-                const latlng = marker.getLatLng();
-                const isVisible = bounds.contains(latlng);
-                if (isVisible) {
-                    marker.addTo(this.map);
-                }
-                else {
-                    marker.removeFrom(this.map);
-                }
+            this.stopMarkers.forEach((marker) => {
+                this._updateMarkerVisibility(bounds, marker);
             });
         }
         else {
@@ -121,6 +130,7 @@ export class MapService {
         this.tileLayer.addTo(this.map);
         this.map.on("moveend zoomend", () => this.updateVisibleMarkers());
         this.stopLayer = layerGroup();
+        this.bajsLayer = layerGroup();
         this.map.createPane("priorityMarkers");
         this.map.getPane("priorityMarkers").style.zIndex = "9999";
         const newMarker = marker([0, 0], {
@@ -349,6 +359,31 @@ export class MapService {
             if (marker) {
                 marker.getElement()?.classList.remove("active");
             }
+        }
+    }
+    addBajsStopMarker(stop) {
+        const newMarker = marker([stop.lat, stop.lng], {
+            icon: icon({
+                iconUrl: "/icons/bikePin.svg",
+                iconSize: [48, 48]
+            })
+        });
+        newMarker.addEventListener("click", async () => {
+            this.goToLocation([stop.lat, stop.lng]);
+        });
+        newMarker.bindTooltip(stop.name, {
+            offset: point(15, 0)
+        });
+        this.bajsStopMarkers.set(stop.uid, newMarker);
+        this.bajsStopInfo.set(stop.uid, stop);
+        newMarker.addTo(this.bajsLayer);
+    }
+    toggleBajsStops() {
+        if (!this.appStore?.leftMenuFilters.bajsStops) {
+            this.map?.removeLayer(this.bajsLayer);
+        }
+        else {
+            this.map?.addLayer(this.bajsLayer);
         }
     }
 }

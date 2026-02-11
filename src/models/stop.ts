@@ -17,3 +17,12 @@ export interface IStopArrivalModel {
   scheduledArrivalTime: string;
   tripId: string;
 }
+
+export interface IBajsStopModel {
+  uid: number;
+  lat: number;
+  lng: number;
+  name: string;
+  bikes_available_to_rent: number;
+  bike_racks: number;
+}

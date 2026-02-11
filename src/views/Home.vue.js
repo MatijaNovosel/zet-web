@@ -16,7 +16,8 @@ const mapService = getService(Types.MapService);
 const stopsService = getService(Types.StopsService);
 const state = reactive({
     vehicles: [],
-    stops: []
+    stops: [],
+    bajsStops: []
 });
 let vehiclePollInterval = null;
 let currentLocationPollInterval = null;
@@ -71,6 +72,13 @@ const getStops = async () => {
     state.stops = data;
     for (const stop of data) {
         mapService.addStopMarker(stop);
+    }
+};
+const getBajsStops = async () => {
+    const data = await stopsService.getBajsStops();
+    state.bajsStops = data;
+    for (const stop of data) {
+        mapService.addBajsStopMarker(stop);
     }
 };
 const pollCurrentLocation = () => {
@@ -148,27 +156,35 @@ watch(() => appStore.leftMenuFilters.satelliteMap, (val) => {
         mapService.changeMapType(MapTypeEnum.Street);
     }
 });
+watch(() => appStore.leftMenuFilters.bajsStops, () => {
+    mapService.toggleBajsStops();
+}, {
+    immediate: true
+});
 onMounted(async () => {
-    appStore.loading = true;
-    mapService.createMap();
-    createLayers();
-    await getStops();
-    await pollData();
-    pollCurrentLocation();
-    mapService.updateVisibleMarkers();
-    const routeId = router.currentRoute.value.params.id;
-    if (routeId && routeId !== "home") {
-        mapService.trackVehicle(Number(routeId));
+    try {
+        appStore.loading = true;
+        mapService.createMap();
+        createLayers();
+        await getStops();
+        await getBajsStops();
+        await pollData();
+        pollCurrentLocation();
+        mapService.updateVisibleMarkers();
+        const routeId = router.currentRoute.value.params.id;
+        if (routeId && routeId !== "home") {
+            mapService.trackVehicle(Number(routeId));
+        }
     }
-    appStore.loading = false;
+    finally {
+        appStore.loading = false;
+    }
 });
 onUnmounted(() => {
-    if (vehiclePollInterval) {
+    if (vehiclePollInterval)
         clearInterval(vehiclePollInterval);
-    }
-    if (currentLocationPollInterval) {
+    if (currentLocationPollInterval)
         clearInterval(currentLocationPollInterval);
-    }
 });
 debugger; /* PartiallyEnd: #3632/scriptSetup.vue */
 const __VLS_ctx = {};

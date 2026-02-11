@@ -1,4 +1,4 @@
-import { IStopModel } from "@/models/stop";
+import { IBajsStopModel, IStopModel } from "@/models/stop";
 import { IVehicleModel } from "@/models/vehicle";
 import { LayerGroup, Marker } from "leaflet";
 
@@ -29,6 +29,10 @@ export interface IMapService {
   getMarker(vehicleId: number): Marker | undefined;
 
   addStopMarker(stop: IStopModel): void;
+  toggleBajsStops(): void;
+
+  // Bajs
+  addBajsStopMarker(stop: IBajsStopModel): void;
 
   isInViewport(coords: [number, number]): boolean;
 

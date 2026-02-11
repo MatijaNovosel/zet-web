@@ -105,8 +105,8 @@ body {
 }
 
 .vehicle-marker {
-  width: 35px;
-  height: 35px;
+  width: 30px;
+  height: 30px;
   position: relative;
   border-radius: 50%;
   box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
@@ -131,13 +131,13 @@ body {
     position: absolute;
     color: white;
     font-weight: bold;
-    font-size: 14px;
+    font-size: 12px;
     text-align: center;
     line-height: 15px;
     font-weight: bold;
     font-family: Roboto;
-    width: 35px;
-    height: 35px;
+    width: 30px;
+    height: 30px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -149,8 +149,8 @@ body {
     z-index: -1;
     position: absolute;
     background-color: transparent;
-    width: 35px;
-    height: 35px;
+    width: 30px;
+    height: 30px;
 
     &-arrow {
       position: absolute;
@@ -249,6 +249,15 @@ body {
       z-index: -1;
     }
   }
+}
+
+.bajs-stop-marker {
+  width: 20px;
+  height: 20px;
+  position: relative;
+  background-color: #4cc540;
+  border-radius: 50%;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 .v-list-item-subtitle {
