@@ -6,6 +6,10 @@
 <p align=center>Aplikacija za praćenje ZET vozila uživo.</p>
 <p align=center>Backend: <a href="https://github.com/knork-fork/zet-gtfs-backend">zet-gtfs-backend</a> </p>
 
+<p align=center>
+  <img src="https://github.com/user-attachments/assets/4f8bdc42-5682-4a63-a79d-9f65bd9b4cc2" />
+</p>
+
 ## ✨ Features
 
 - Praćenje tramvaja i autobusa uživo na karti Zagreba, s jasno označenim linijama  
