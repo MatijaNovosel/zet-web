@@ -159,11 +159,12 @@ const allBusesShowing = computed(() => {
 });
 
 const filtersActive = computed(() => {
-  return appStore.leftMenuFilters.activeRoutes.size;
+  return appStore.leftMenuFilters.activeRoutes.size || appStore.leftMenuFilters.bajsStops;
 });
 
 const clearFilters = () => {
   appStore.leftMenuFilters.activeRoutes.clear();
+  appStore.leftMenuFilters.bajsStops = false;
 };
 
 const shouldDisableControls = computed(() => {
