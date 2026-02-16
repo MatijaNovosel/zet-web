@@ -25,10 +25,11 @@ const allBusesShowing = computed(() => {
     return allBusLines.every((x) => appStore.leftMenuFilters.activeRoutes.has(x));
 });
 const filtersActive = computed(() => {
-    return appStore.leftMenuFilters.activeRoutes.size;
+    return appStore.leftMenuFilters.activeRoutes.size || appStore.leftMenuFilters.bajsStops;
 });
 const clearFilters = () => {
     appStore.leftMenuFilters.activeRoutes.clear();
+    appStore.leftMenuFilters.bajsStops = false;
 };
 const shouldDisableControls = computed(() => {
     return appStore.activeVehicle !== null;

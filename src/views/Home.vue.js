@@ -96,6 +96,12 @@ const pollCurrentLocation = () => {
         }
     }, 5000);
 };
+const addBlogLink = () => {
+    const leafletControlDiv = document.getElementsByClassName("leaflet-control-attribution")[0];
+    if (leafletControlDiv) {
+        leafletControlDiv.innerHTML += ` | <a href="https://zet-uzivo.com/blog">Blog</a>`;
+    }
+};
 watch(() => appStore.activeStop, (val) => {
     if (!val) {
         mapService.removeActiveStopMarker();
@@ -175,6 +181,7 @@ onMounted(async () => {
         if (routeId && routeId !== "home") {
             mapService.trackVehicle(Number(routeId));
         }
+        addBlogLink();
     }
     finally {
         appStore.loading = false;
