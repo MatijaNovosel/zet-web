@@ -20,12 +20,12 @@ const __VLS_0 = {}.VListItem;
 /** @type {[typeof __VLS_components.VListItem, typeof __VLS_components.vListItem, typeof __VLS_components.VListItem, typeof __VLS_components.vListItem, ]} */ ;
 // @ts-ignore
 const __VLS_1 = __VLS_asFunctionalComponent(__VLS_0, new __VLS_0({
-    title: "ZET Web",
+    title: "ZET Uživo",
     subtitle: "ZET tramvaji i autobusi uživo - interaktivna karta Zagreba u stvarnom vremenu",
     ...{ class: "text-subtitle-2 py-3" },
 }));
 const __VLS_2 = __VLS_1({
-    title: "ZET Web",
+    title: "ZET Uživo",
     subtitle: "ZET tramvaji i autobusi uživo - interaktivna karta Zagreba u stvarnom vremenu",
     ...{ class: "text-subtitle-2 py-3" },
 }, ...__VLS_functionalComponentArgsRest(__VLS_1));

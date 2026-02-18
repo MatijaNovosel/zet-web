@@ -4,7 +4,7 @@
     :style="leftMenuStyle"
   >
     <v-list-item
-      title="ZET Web"
+      title="ZET Uživo"
       subtitle="ZET tramvaji i autobusi uživo - interaktivna karta Zagreba u stvarnom vremenu"
       class="text-subtitle-2 py-3"
     >
