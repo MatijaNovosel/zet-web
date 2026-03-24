@@ -11,16 +11,10 @@
       <template #prepend>
         <v-progress-circular
           color="blue"
+          bg-color="black"
           :model-value="appStore.progress"
           class="mr-5"
-        >
-          <v-icon
-            class="spinPulse"
-            size="15"
-          >
-            mdi-timer-sand
-          </v-icon>
-        </v-progress-circular>
+        />
       </template>
     </v-list-item>
     <template v-if="appStore.leftMenuFilters.menuOpen">
@@ -34,7 +28,7 @@
         flat
         variant="text"
         size="30px"
-        color="black"
+        color="white"
         @click="appStore.leftMenuFilters.menuOpen = !appStore.leftMenuFilters.menuOpen"
       />
     </div>
@@ -56,7 +50,8 @@ const leftMenuStyle = computed(() => ({
 <style lang="scss" scoped>
 .left_menu {
   position: absolute;
-  background-color: white;
+  background-color: #1d232a;
+  color: white;
   z-index: 999;
   top: 25px;
   left: 25px;

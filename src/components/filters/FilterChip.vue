@@ -17,8 +17,8 @@ const props = defineProps<{
 }>();
 
 const style = computed(() => ({
-  backgroundColor: props.active ? props.color : "#e3d8d8",
-  color: props.active ? "white" : "#8f8181"
+  backgroundColor: props.active ? props.color : "rgb(95 82 82)",
+  color: props.active ? "white" : "#e3d8d8"
 }));
 </script>
 

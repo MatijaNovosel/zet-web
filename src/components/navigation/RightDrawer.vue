@@ -78,6 +78,7 @@
     :order="1"
     v-model="drawer"
     mobile
+    class="right_drawer"
     location="right"
   >
     <div class="right_menu_toolbar">
@@ -207,6 +208,11 @@ watch(
 </script>
 
 <style lang="scss" scoped>
+.right_drawer {
+  background-color: #1d232a;
+  color: white;
+}
+
 .toolbar {
   flex-wrap: nowrap;
   position: absolute;
@@ -216,8 +222,9 @@ watch(
   display: flex;
   transform: translate(-50%, -50%);
   align-items: center;
-  background-color: white;
+  background-color: #1d232a;
   justify-content: center;
+  color: white;
   border-radius: 6px;
   box-shadow: #64646f33 0px 7px 29px 0px;
 
@@ -267,7 +274,7 @@ watch(
   &_separator {
     width: 1px;
     align-self: stretch;
-    background-color: #0000002a;
+    background-color: rgba(255, 255, 255, 0.219);
     margin-left: 4px;
   }
 
@@ -298,7 +305,7 @@ watch(
 
         &_subtitle {
           font-size: 12px;
-          color: #3b3838be;
+          color: #dac0c0be;
         }
       }
     }

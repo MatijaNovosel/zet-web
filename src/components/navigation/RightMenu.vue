@@ -36,13 +36,13 @@
         icon="mdi-close"
         variant="text"
         size="40px"
-        color="black"
+        color="white"
         @click="closeMenu"
       />
     </div>
     <v-divider />
     <template v-if="appStore.activeVehicle">
-      <div class="d-flex align-center justify-space-between pl-4 py-2">
+      <div class="d-flex align-center justify-space-between pl-4">
         <v-checkbox
           hide-details
           density="compact"
@@ -66,12 +66,12 @@
         </v-btn>
       </div>
       <v-divider />
-      <div class="d-flex align-center justify-end py-3 pr-5">
+      <div class="d-flex align-center justify-end py-1 pr-5">
         <v-btn
           variant="text"
           rounded="0"
-          color="blue-darken-1"
-          class="text-none"
+          color="white"
+          class="share_btn"
           @click="shareVehicle"
         >
           Podijeli
@@ -154,13 +154,19 @@ watch(
 
 <style lang="scss" scoped>
 .track_vehicle_label {
-  font-size: 14px;
+  font-size: 12px;
   margin-left: 6px;
+}
+
+.share_btn {
+  font-size: 12px;
+  text-transform: none;
 }
 
 .right_menu {
   position: absolute;
-  background-color: white;
+  background-color: #1d232a;
+  color: white;
   z-index: 999;
   top: 25px;
   right: 25px;
@@ -255,7 +261,7 @@ watch(
         display: flex;
         align-items: center;
         justify-content: center;
-        font-size: 15px;
+        font-size: 12px;
         font-weight: bold;
         color: white;
       }
@@ -268,7 +274,7 @@ watch(
 
         &_subtitle {
           font-size: 12px;
-          color: #3b3838be;
+          color: #b8afafbe;
         }
       }
     }

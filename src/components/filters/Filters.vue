@@ -69,7 +69,7 @@
       </v-btn>
     </div>
     <v-divider />
-    <div class="d-flex pl-2 py-1 ga-2">
+    <div class="d-flex pl-2 py-1 ga-2 items-center justify-center">
       <v-checkbox
         v-model="appStore.leftMenuFilters.showNight"
         hide-details
@@ -95,7 +95,7 @@
     <v-divider />
     <div class="vehicle_filters">
       <div class="flex-column justify-center my-2 pb-1">
-        <div class="text-caption pl-2 text-grey-darken-2">Tramvaji</div>
+        <div class="text-caption pl-2 text-grey-lighten-3">Tramvaji</div>
         <div class="d-flex ga-2 flex-wrap pl-2 mt-2">
           <filter-chip
             v-for="tram in appStore.tramsToDisplay"
@@ -109,7 +109,7 @@
       </div>
       <v-divider />
       <div class="flex-column column justify-center my-2">
-        <div class="text-caption pl-2 text-grey-darken-2">Autobusi</div>
+        <div class="text-caption pl-2 text-grey-lighten-2">Autobusi</div>
         <div class="d-flex ga-2 flex-wrap pl-2 mt-2">
           <filter-chip
             v-for="bus in appStore.busesToDisplay"
@@ -222,6 +222,7 @@ const goToCurrentLocation = async () => {
 .route_display_label {
   font-size: 14px;
   margin-bottom: 1px;
+  font-size: 10px;
 }
 
 .vehicle_filters {

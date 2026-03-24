@@ -2,15 +2,16 @@
   <v-btn
     v-if="mobile && !drawer"
     icon="mdi-menu"
-    color="white"
     :size="40"
     class="drawer_btn"
+    color="#1d232a"
     @click="drawer = !drawer"
   />
   <v-navigation-drawer
     :order="1"
     v-model="drawer"
     mobile
+    class="left_drawer"
   >
     <template #prepend>
       <v-list-item
@@ -21,22 +22,16 @@
         <template #prepend>
           <v-progress-circular
             color="blue"
+            bg-color="black"
             :model-value="appStore.progress"
             class="mr-5"
-          >
-            <v-icon
-              class="spinPulse"
-              size="15"
-            >
-              mdi-timer-sand
-            </v-icon>
-          </v-progress-circular>
+          />
         </template>
         <template #append>
           <v-btn
             icon="mdi-close"
             variant="text"
-            color="black"
+            color="white"
             :size="35"
             @click="drawer = !drawer"
           />
@@ -66,5 +61,10 @@ const drawer = ref(false);
   z-index: 9999;
   top: 12px;
   left: 12px;
+}
+
+.left_drawer {
+  background-color: #1d232a;
+  color: white;
 }
 </style>
