@@ -1,7 +1,3 @@
-<p align=center>
-  <img src="https://github.com/user-attachments/assets/0c489323-e714-4e20-a304-48ab4ed4d2d4" width="200" height="200" />
-</p>
-
 <h1 align=center>ZET Web (ZET Uživo)</h1>
 <p align=center>Aplikacija za praćenje ZET vozila uživo.</p>
 <p align=center>Backend: <a href="https://github.com/knork-fork/zet-gtfs-backend">zet-gtfs-backend</a> </p>
